@@ -23,6 +23,3 @@ export abstract class BaseEntity {
     @Column({ default: true })
     is_active: boolean;
 }
-function v1(): string {
-    throw new Error('Function not implemented.');
-}

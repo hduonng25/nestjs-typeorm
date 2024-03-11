@@ -1,5 +1,6 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../common';
+import { BlogEntity } from '../../blog/entity/blog.entity';
 
 @Entity({ name: 'user' })
 export class UserEntity extends BaseEntity {
@@ -16,9 +17,6 @@ export class UserEntity extends BaseEntity {
     age: number;
 
     @Column()
-    address: string;
-
-    @Column()
     email: string;
 
     @Column()
@@ -29,4 +27,7 @@ export class UserEntity extends BaseEntity {
         enum: ['ADMIN', 'STAFF', 'CUSTOMER'],
     })
     roles: string[];
+
+    @OneToMany(() => BlogEntity, (blog) => blog.user)
+    blog: BlogEntity[];
 }

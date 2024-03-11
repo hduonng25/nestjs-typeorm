@@ -1,1 +1,1 @@
-export * from './type-orm.abstract.service'
+export * from './type-orm.abstract.service';

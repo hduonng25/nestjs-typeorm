@@ -29,7 +29,7 @@ export class UserService extends BaseService<UserEntity> {
             where,
             take: size,
             skip,
-            select: ['id', 'full_name', 'age', 'address', 'email'],
+            select: ['id', 'full_name', 'age', 'email'],
             order: { created_date: 'DESC' },
         };
 
