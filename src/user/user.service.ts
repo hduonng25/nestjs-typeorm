@@ -10,12 +10,14 @@ import * as bcrypt from 'bcrypt';
 import { v1 } from 'uuid';
 import { plainToInstance } from 'class-transformer';
 import { changePasswordDTO } from './dto/change.password.dto';
+import { checkUser } from './check/check.user';
 
 @Injectable()
 export class UserService extends BaseService<UserEntity> {
     constructor(
         @InjectRepository(UserEntity)
         protected readonly UserRepository: Repository<UserEntity>,
+        private readonly checkUser: checkUser,
     ) {
         super();
     }
@@ -52,15 +54,41 @@ export class UserService extends BaseService<UserEntity> {
     }
 
     async create(params: UserDTO): Promise<Result> {
-        params.id = v1();
-        params.password = await bcrypt.hash(params.password.toString(), 10);
-        const user = await this.UserRepository.save(params);
-        const result = plainToInstance(UserDTO, user, { excludeExtraneousValues: true });
-        return success.ok(result);
+        const check = await this.UserRepository.findOne({
+            where: {
+                email: params.email,
+                is_deleted: false,
+                is_active: true,
+            },
+        });
+
+        if (check) {
+            return error.commonError({
+                location: 'user',
+                param: 'email',
+                message: `Email ${params.email} already exists`,
+            });
+        } else {
+            params.id = v1();
+            params.password = await bcrypt.hash(params.password.toString(), 10);
+            const user = await this.UserRepository.save(params);
+            const result = plainToInstance(UserDTO, user, {
+                excludeExtraneousValues: true,
+            });
+            return success.ok(result);
+        }
     }
 
     async update(params: UserDTO): Promise<Result> {
-        const user = await this.UserRepository.findOne({ where: { id: params.id } });
+        await this.checkUser.checkExitsUser({
+            id: params.id,
+            email: params.email,
+        });
+
+        const user = await this.UserRepository.findOne({
+            where: { id: params.id },
+        });
+
         if (user) {
             await this.UserRepository.update(params.id, params);
             return success.ok('Update successfully');
@@ -76,7 +104,9 @@ export class UserService extends BaseService<UserEntity> {
         for (const item of params.ids) {
             const user = await this.UserRepository.findOne({
                 where: {
-                    id: item, is_deleted: false, is_active: true,
+                    id: item,
+                    is_deleted: false,
+                    is_active: true,
                 },
             });
 
@@ -87,7 +117,6 @@ export class UserService extends BaseService<UserEntity> {
                     location: 'user',
                     message: 'User not found',
                 });
-
             }
         }
 
@@ -103,10 +132,18 @@ export class UserService extends BaseService<UserEntity> {
             },
         });
         if (user) {
-            const checkPass = bcrypt.compareSync(params.old_password.toString(), user.password);
+            const checkPass = bcrypt.compareSync(
+                params.old_password.toString(),
+                user.password,
+            );
             if (checkPass) {
-                const password = await bcrypt.hash(params.new_password.toString(), 10);
-                await this.UserRepository.update(params.id, { password: password });
+                const password = await bcrypt.hash(
+                    params.new_password.toString(),
+                    10,
+                );
+                await this.UserRepository.update(params.id, {
+                    password: password,
+                });
             } else {
                 return error.commonError({
                     location: 'password',

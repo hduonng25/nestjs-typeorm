@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, IsNull, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../common';
 import { BlogEntity } from '../../blog/entity/blog.entity';
 
@@ -30,6 +30,9 @@ export class UserEntity extends BaseEntity {
 
     @Column({ default: 0 })
     fail_login: number;
+
+    @Column({ type: 'datetime', nullable: true })
+    last_locked: Date;
 
     @OneToMany(() => BlogEntity, (blog) => blog.user)
     blog: BlogEntity[];

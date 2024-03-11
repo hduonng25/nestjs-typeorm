@@ -12,8 +12,9 @@ async function main() {
     const port = configs.app.port;
     const prefix = configs.app.prefix;
 
-    app.useGlobalPipes(new ValidationPipe());
     app.setGlobalPrefix(prefix);
+    app.useGlobalPipes(new ValidationPipe());
+    app.useBodyParser('json', { limit: '10mb' });
 
     await app.listen(port, host, () => {
         Logger.verbose(`Listening on: ${host}:${port}`);

@@ -1,6 +1,6 @@
 import { Exclude, Expose, Transform } from 'class-transformer';
 import { BaseDTO } from '../../common';
-import { IsNotEmpty } from 'class-validator';
+import { IsEmail, IsNotEmpty } from 'class-validator';
 
 export class UserDTO extends BaseDTO {
     @IsNotEmpty()
@@ -9,7 +9,7 @@ export class UserDTO extends BaseDTO {
     @IsNotEmpty()
     last_name: string;
 
-    @Transform(({ obj }) => obj.first_name + " " + obj.last_name)
+    @Transform(({ obj }) => obj.first_name + ' ' + obj.last_name)
     @Expose()
     full_name: string;
 
@@ -18,14 +18,17 @@ export class UserDTO extends BaseDTO {
     age: number;
 
     @IsNotEmpty()
+    @IsEmail()
     @Expose()
     email: string;
 
     @Exclude()
     password: string;
 
+    @Exclude()
+    last_locked: Date;
+
     @IsNotEmpty()
     @Expose()
     roles: string[];
 }
-
