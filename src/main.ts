@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { configs } from './configs';
 import { Logger, ValidationPipe } from '@nestjs/common';
+import cors from 'cors';
 
 async function main() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -13,6 +14,7 @@ async function main() {
     const prefix = configs.app.prefix;
 
     app.setGlobalPrefix(prefix);
+
     app.useGlobalPipes(new ValidationPipe());
     app.useBodyParser('json', { limit: '10mb' });
 

@@ -10,7 +10,7 @@ import { CheckRolesMiddleware } from './middleware/check.role.middleware';
     imports: [TypeOrmModule.forFeature([UserEntity])],
     providers: [UserService, checkUser],
     controllers: [UserController],
-    exports: [],
+    exports: [UserService],
 })
 
 export class UserModule implements NestModule {
