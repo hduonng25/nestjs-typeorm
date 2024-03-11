@@ -4,8 +4,8 @@ export class BaseDTO {
     @Expose()
     id: string;
 
-    ids: string[]
-    F
+    ids: string[];
+    F;
     created_date: Date;
 
     updated_date: Date;
