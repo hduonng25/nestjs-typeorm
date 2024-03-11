@@ -15,5 +15,5 @@ export const withCache: TypeOrmModuleOptions = {
             : process.env.DB_NAME_POSTGRES,
     synchronize: true,
     entities: [__dirname, './**/*.entity{.ts,.js}'],
-    dropSchema: true,
+    dropSchema: false,
 };
