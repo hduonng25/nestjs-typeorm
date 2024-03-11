@@ -21,14 +21,14 @@ export class AuthService {
 
     public async login(params: LoginDTO) {
         try {
-            const numberOfTired: number = 5;
+            const numberOfTired: number = 5; //TODO: Số lần đăng nhập được phép trước khi bị khoá
             const user = await this.UserRepository.findOne({
                 where: { email: params.email },
-            });
+            }); //TODO: Tìm kiê user dựa theo email được truyền vào
 
             if (user && user.password) {
                 if (user.fail_login === numberOfTired - 1) {
-                    user.last_locked = new Date();
+                    user.last_locked = new Date(); //TODO: Quy ước đếm từ 0, khi đến số lâ đăng nhập được cho phép thì khoá
                 } else if (user.fail_login === numberOfTired) {
                     const lastLocked = user.last_locked
                         ? user.last_locked
@@ -43,7 +43,7 @@ export class AuthService {
                         diffInMicrosecond / (60 * 1000),
                     );
 
-                    if (diffInMinutes <= 30) {
+                    if (diffInMinutes <= 30) { //TODO: Bị khoá 30 phút nếu như đăng nhập thất bại 5 lần, check xem thời gian khoá còn lại là bao nhiu
                         return error.commonError({
                             location: 'user',
                             param: 'email or password',
@@ -58,8 +58,10 @@ export class AuthService {
                 });
             }
 
-            const check_pass = bcrypt.compareSync(params.password.toString(), user.password);
+            const check_pass = bcrypt.compareSync(params.password.toString(), user.password); //TODO: check xem mật khẩu truyền vào với mật khẩu trong DB có khớp nhau không
+
             if (check_pass) {
+                //TODO: Nếu có khớp nhau thì xử lý và tạo token
                 const { id, email, full_name } = user;
                 const roles = [user.roles as unknown as string];
                 const payload = { id, email, full_name, roles };

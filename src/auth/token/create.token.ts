@@ -33,7 +33,7 @@ export class Token {
                 HttpsStatus.BAD_REQUEST,
             );
         }
-    }
+    }//TODO: Tạo access token với nhưng dữ liệu được truyền vào của user
 
     public async ganRefreshToken(id: string): Promise<{
         token: string;
@@ -55,5 +55,5 @@ export class Token {
                 HttpsStatus.BAD_REQUEST,
             );
         }
-    }
+    }//TODO: Tạo refresh token theo id của user
 }
