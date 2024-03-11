@@ -56,4 +56,17 @@ export class Token {
             );
         }
     }//TODO: Tạo refresh token theo id của user
+
+    public async getPayload(token: string): Promise<Payload> {
+        try {
+            const public_key = configs.keys.public_key;
+            const payload = <Payload>this.jwtService.verify(token, {
+                publicKey: public_key,
+            });
+
+            return payload;
+        } catch (e) {
+            throw new HttpException('Faild gen payload', HttpsStatus.INTERNAL_SERVER);
+        }
+    }
 }

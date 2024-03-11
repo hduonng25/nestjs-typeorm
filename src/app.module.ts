@@ -9,20 +9,24 @@ import { CheckTokenReq } from './auth/check/check.token.request';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './shared/guard';
+import { UserController } from './user/user.controller';
+import { AuthController } from './auth/auth.controller';
+import { UserService } from './user/user.service';
+import { AuthService } from './auth/auth.service';
 
 @Module({
     imports: [
-        UserModule,
-        TypeOrmModule.forRoot(withCache),
-        BlogModule,
-        CategoryModule,
-        AuthModule,
         JwtModule.register({
             secret: configs.keys.public_key,
             signOptions: { expiresIn: '2h' },
         }),
+        TypeOrmModule.forRoot(withCache),
+        UserModule,
+        BlogModule,
+        CategoryModule,
+        AuthModule,
     ],
-    controllers: [],
+    controllers: [UserController, AuthController],
     providers: [
         {
             provide: APP_GUARD,
@@ -35,8 +39,11 @@ export class AppModule {
     configure(consumer: MiddlewareConsumer) {
         consumer
             .apply(CheckTokenReq)
-            .exclude({ path: '127.0.0.1:3009/api/v1/auth/', method: RequestMethod.POST })
-            .exclude({ path: '/user/', method: RequestMethod.POST })
+            .exclude(
+                { path: '/auth/login', method: RequestMethod.POST },
+                { path: '/auth/refresh-token', method: RequestMethod.POST },
+                { path: '/user/', method: RequestMethod.POST },
+            )
             .forRoutes('*');
     }
 }

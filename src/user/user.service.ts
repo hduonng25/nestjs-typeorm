@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { FindManyOptions, Repository } from 'typeorm';
 import { UserEntity } from './entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,6 +11,7 @@ import { v1 } from 'uuid';
 import { plainToInstance } from 'class-transformer';
 import { changePasswordDTO } from './dto/change.password.dto';
 import { checkUser } from './check/check.user';
+import { HttpsStatus } from '../common/constant';
 
 @Injectable()
 export class UserService extends BaseService<UserEntity> {
@@ -54,28 +55,28 @@ export class UserService extends BaseService<UserEntity> {
     }
 
     async create(params: UserDTO): Promise<Result> {
-        const check = await this.UserRepository.findOne({
-            where: {
-                email: params.email,
-                is_deleted: false,
-                is_active: true,
-            },
-        });
+        try {
+            const check = await this.UserRepository.findOne({
+                where: {
+                    email: params.email,
+                    is_deleted: false,
+                    is_active: true,
+                },
+            });
 
-        if (check) {
-            return error.commonError({
-                location: 'user',
-                param: 'email',
-                message: `Email ${params.email} already exists`,
-            });
-        } else {
-            params.id = v1();
-            params.password = await bcrypt.hash(params.password.toString(), 10);
-            const user = await this.UserRepository.save(params);
-            const result = plainToInstance(UserDTO, user, {
-                excludeExtraneousValues: true,
-            });
-            return success.ok(result);
+            if (!check) {
+                params.id = v1();
+                params.password = await bcrypt.hash(params.password.toString(), 10);
+                const user = await this.UserRepository.save(params);
+                const result = plainToInstance(UserDTO, user, {
+                    excludeExtraneousValues: true,
+                });
+                return success.ok(result);
+            } else {
+                throw new HttpException(`Email ${params.email} already exists`, HttpsStatus.BAD_REQUEST);
+            }
+        } catch (e) {
+            throw new HttpException(`Email ${params.email} already exists`, HttpsStatus.BAD_REQUEST);
         }
     }
 
