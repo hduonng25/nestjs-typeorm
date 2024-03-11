@@ -10,7 +10,7 @@ export class UserEntity extends BaseEntity {
     @Column()
     last_name: string;
 
-    @Column({})
+    @Column()
     full_name: string;
 
     @Column()
@@ -27,6 +27,9 @@ export class UserEntity extends BaseEntity {
         enum: ['ADMIN', 'STAFF', 'CUSTOMER'],
     })
     roles: string[];
+
+    @Column({ default: 0 })
+    fail_login: number;
 
     @OneToMany(() => BlogEntity, (blog) => blog.user)
     blog: BlogEntity[];

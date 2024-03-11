@@ -1,15 +1,12 @@
 import {
     Column,
-    CreateDateColumn,
-    PrimaryGeneratedColumn,
+    CreateDateColumn, PrimaryColumn,
     UpdateDateColumn,
 } from 'typeorm';
 
-import { v1 as uuid1 } from 'uuid';
-
 export abstract class BaseEntity {
-    @PrimaryGeneratedColumn()
-    id: string = uuid1();
+    @PrimaryColumn()
+    id: string;
 
     @CreateDateColumn()
     created_date: Date;

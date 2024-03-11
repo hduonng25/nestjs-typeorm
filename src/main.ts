@@ -12,11 +12,12 @@ async function main() {
     const port = configs.app.port;
     const prefix = configs.app.prefix;
 
-    app.setGlobalPrefix(prefix);
     app.useGlobalPipes(new ValidationPipe());
+    app.setGlobalPrefix(prefix);
 
     await app.listen(port, host, () => {
         Logger.verbose(`Listening on: ${host}:${port}`);
     });
 }
+
 main();
