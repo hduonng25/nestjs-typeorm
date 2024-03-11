@@ -5,6 +5,17 @@ import { HttpsStatus } from '../../common/constant';
 import { configs } from '../../configs';
 import { Payload } from '../dto';
 
+declare module 'express-serve-static-core' {
+    interface Request {
+        payload?: Payload;
+        request_id: string;
+        correlation_id?: string;
+        requested_time?: number;
+        source_hostname?: string;
+        source_netname?: string;
+    }
+} //TODO: Mở rộng phương thức của đối tượng Request
+
 @Injectable()
 export class CheckTokenReq implements NestMiddleware {
     constructor(private readonly jwtService: JwtService) {
@@ -39,4 +50,4 @@ export class CheckTokenReq implements NestMiddleware {
             }
         }
     }
-}
+}//TODO: Middleware check xem có token truyền vào header của req không và check xem token có hợp lệ hay không

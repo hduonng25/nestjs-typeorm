@@ -7,6 +7,8 @@ import { CategoryModule } from './category/category.module';
 import { AuthModule } from './auth/auth.module';
 import { CheckTokenReq } from './auth/check/check.token.request';
 import { JwtModule } from '@nestjs/jwt';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './shared/guard';
 
 @Module({
     imports: [
@@ -21,7 +23,12 @@ import { JwtModule } from '@nestjs/jwt';
         }),
     ],
     controllers: [],
-    providers: [],
+    providers: [
+        {
+            provide: APP_GUARD,
+            useClass: RolesGuard,
+        },
+    ],
 })
 
 export class AppModule {
