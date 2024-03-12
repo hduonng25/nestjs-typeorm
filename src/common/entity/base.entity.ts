@@ -1,12 +1,14 @@
 import {
     Column,
     CreateDateColumn,
+    DeleteDateColumn,
     PrimaryColumn,
+    PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
 
 export abstract class BaseEntity {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @CreateDateColumn()
@@ -15,8 +17,8 @@ export abstract class BaseEntity {
     @UpdateDateColumn()
     updated_date: Date;
 
-    @Column({ default: false })
-    is_deleted: boolean;
+    @DeleteDateColumn({ nullable: true })
+    deleted_at: Date;
 
     @Column({ default: true })
     is_active: boolean;

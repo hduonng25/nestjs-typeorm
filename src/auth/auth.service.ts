@@ -9,6 +9,7 @@ import { plainToInstance } from 'class-transformer';
 import { UserDTO } from '../user/dto/user.dto';
 import { HttpsStatus } from '../common/constant';
 import { Token } from './token';
+import { configs } from '../configs';
 
 @Injectable()
 export class AuthService {
@@ -16,20 +17,20 @@ export class AuthService {
         @InjectRepository(UserEntity)
         protected readonly UserRepository: Repository<UserEntity>,
         private readonly token: Token,
-    ) {
-    }
+    ) {}
 
     public async login(params: LoginDTO) {
         try {
-            const numberOfTired: number = 5; //Số lần đăng nhập được phép trước khi bị khoá
+            const numberOfTired: number = parseFloat(
+                configs.login.number_of_tired,
+            ); //Số lần đăng nhập được phép trước khi bị khoá
             const user = await this.UserRepository.findOne({
                 where: { email: params.email },
             }); // Tìm kiêm user dựa theo email được truyền vào
 
             if (user && user.password) {
                 if (user.fail_login === numberOfTired - 1) {
-                    await this.UserRepository
-                        .createQueryBuilder()
+                    await this.UserRepository.createQueryBuilder()
                         .update(user)
                         .set({
                             last_locked: new Date(),
@@ -50,14 +51,20 @@ export class AuthService {
                         diffInMicrosecond / (60 * 1000),
                     );
 
-                    if (diffInMinutes <= 30) { //Bị khoá 30 phút nếu như đăng nhập thất bại 5 lần, check xem thời gian khoá còn lại là bao nhiu
+                    const lockTime = parseFloat(configs.auth.lock_time);
+
+                    if (diffInMinutes <= lockTime) {
+                        //Bị khoá 30 phút nếu như đăng nhập thất bại 5 lần, check xem thời gian khoá còn lại là bao nhiu
                         return error.commonError({
                             location: 'user',
                             param: 'email or password',
-                            message: 'Account is temporarily locked for 30 minutes',
+                            message:
+                                'Account is temporarily locked for 30 minutes',
                         });
                     } else {
-                        await this.UserRepository.update(user.id, { fail_login: 0 });
+                        await this.UserRepository.update(user.id, {
+                            fail_login: 0,
+                        });
                     }
                 }
             } else {
@@ -67,7 +74,10 @@ export class AuthService {
                 });
             }
 
-            const check_pass = bcrypt.compareSync(params.password.toString(), user.password); //check xem mật khẩu truyền vào với mật khẩu trong DB có khớp nhau không
+            const check_pass = bcrypt.compareSync(
+                params.password.toString(),
+                user.password,
+            ); //check xem mật khẩu truyền vào với mật khẩu trong DB có khớp nhau không
 
             if (check_pass) {
                 // Nếu có khớp nhau thì xử lý và tạo token
@@ -92,8 +102,7 @@ export class AuthService {
                 };
                 return success.ok(data);
             } else {
-                await this.UserRepository
-                    .createQueryBuilder()
+                await this.UserRepository.createQueryBuilder()
                     .update(user)
                     .set({
                         fail_login: () => 'fail_login + 1',
@@ -118,7 +127,6 @@ export class AuthService {
             const user = await this.UserRepository.findOne({
                 where: {
                     id: payload.id,
-                    is_deleted: false,
                     is_active: true,
                 },
             });
@@ -146,11 +154,16 @@ export class AuthService {
             }
         } catch (e) {
             if (e.name && e.name === 'TokenExpiredError') {
-                throw new HttpException('Your token expired', HttpsStatus.INTERNAL_SERVER);
+                throw new HttpException(
+                    'Your token expired',
+                    HttpsStatus.INTERNAL_SERVER,
+                );
             } else {
-                throw new HttpException('Your token is not valid', HttpsStatus.BAD_REQUEST);
+                throw new HttpException(
+                    'Your token is not valid',
+                    HttpsStatus.BAD_REQUEST,
+                );
             }
         }
     }
-
 }

@@ -12,14 +12,17 @@ import { Token } from './token/token';
         JwtModule.registerAsync({
             useFactory: async () => ({
                 privateKey: configs.keys.private_key,
-                signOptions: { expiresIn: '2h', algorithm: 'RS256' },
+                signOptions: {
+                    expiresIn: configs.jwt.expiresIn,
+                    algorithm: 'RS256',
+                },
             }),
         }),
 
-        TypeOrmModule.forFeature([UserEntity])
+        TypeOrmModule.forFeature([UserEntity]),
     ],
     providers: [AuthService, Token],
     controllers: [AuthController],
-    exports: [AuthService]
+    exports: [AuthService],
 })
 export class AuthModule {}

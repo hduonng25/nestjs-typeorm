@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import {
+    MiddlewareConsumer,
+    Module,
+    NestModule,
+    RequestMethod,
+} from '@nestjs/common';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { configs, withCache } from './configs';
@@ -11,15 +16,14 @@ import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './shared/guard';
 import { UserController } from './user/user.controller';
 import { AuthController } from './auth/auth.controller';
-import { UserService } from './user/user.service';
-import { AuthService } from './auth/auth.service';
 
 @Module({
     imports: [
         JwtModule.register({
             secret: configs.keys.public_key,
-            signOptions: { expiresIn: '2h' },
+            signOptions: { expiresIn: configs.jwt.expiresIn },
         }),
+
         TypeOrmModule.forRoot(withCache),
         UserModule,
         BlogModule,
@@ -34,15 +38,23 @@ import { AuthService } from './auth/auth.service';
         },
     ],
 })
-
-export class AppModule {
+export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
         consumer
             .apply(CheckTokenReq)
             .exclude(
-                { path: '/auth/login', method: RequestMethod.POST },
-                { path: '/auth/refresh-token', method: RequestMethod.POST },
-                { path: '/user/', method: RequestMethod.POST },
+                {
+                    path: configs.exclude.auth.login,
+                    method: RequestMethod.POST,
+                },
+                {
+                    path: configs.exclude.auth.refresh_token,
+                    method: RequestMethod.POST,
+                },
+                {
+                    path: configs.exclude.user.create,
+                    method: RequestMethod.POST,
+                },
             )
             .forRoutes('*');
     }

@@ -8,9 +8,16 @@ export class BlogEntity extends BaseEntity {
     @Column()
     content: string;
 
+    @Column({
+        nullable: true,
+    })
+    avatar: string;
+
     @ManyToOne(() => UserEntity, (user) => user.blog)
     user: UserEntity;
 
-    @ManyToOne(() => CategoryEntity, (category) => category.blog)
+    @ManyToOne(() => CategoryEntity, (category) => category.blog, {
+        nullable: true,
+    })
     category: CategoryEntity;
 }

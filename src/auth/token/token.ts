@@ -8,8 +8,7 @@ const private_key = configs.keys.private_key;
 
 @Injectable()
 export class Token {
-    constructor(private readonly jwtService: JwtService) {
-    }
+    constructor(private readonly jwtService: JwtService) {}
 
     public async genAccessToken(payload: Omit<Payload, 'type'>): Promise<{
         token: string;
@@ -17,7 +16,11 @@ export class Token {
     }> {
         try {
             const timestampInSec = new Date().getDate() / 1000;
-            const expireAt = Math.floor(timestampInSec + 60 * 60);
+
+            const timeExpire = parseFloat(configs.jwt.expire_at);
+
+            const expireAt = Math.floor(timestampInSec + timeExpire); //Tinh thoi gian het han cua token
+
             const token = this.jwtService.sign(
                 {
                     ...payload,
@@ -33,7 +36,7 @@ export class Token {
                 HttpsStatus.BAD_REQUEST,
             );
         }
-    }//TODO: Tạo access token với nhưng dữ liệu được truyền vào của user
+    } //TODO: Tạo access token với nhưng dữ liệu được truyền vào của user
 
     public async ganRefreshToken(id: string): Promise<{
         token: string;
@@ -55,7 +58,7 @@ export class Token {
                 HttpsStatus.BAD_REQUEST,
             );
         }
-    }//TODO: Tạo refresh token theo id của user
+    } //TODO: Tạo refresh token theo id của user
 
     public async getPayload(token: string): Promise<Payload> {
         try {
@@ -66,7 +69,10 @@ export class Token {
 
             return payload;
         } catch (e) {
-            throw new HttpException('Faild gen payload', HttpsStatus.INTERNAL_SERVER);
+            throw new HttpException(
+                'Faild gen payload',
+                HttpsStatus.INTERNAL_SERVER,
+            );
         }
     }
 }

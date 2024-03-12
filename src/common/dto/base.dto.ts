@@ -5,12 +5,8 @@ export class BaseDTO {
     id: string;
 
     ids: string[];
-    F;
-    created_date: Date;
 
-    updated_date: Date;
-
-    is_deleted: boolean;
+    // deleted_at: Date;
 
     is_active: boolean;
 }
