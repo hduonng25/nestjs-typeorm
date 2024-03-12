@@ -22,7 +22,6 @@ export class UserDTO extends BaseDTO {
     @Expose()
     email: string;
 
-    @Exclude()
     password: string;
 
     @Exclude()

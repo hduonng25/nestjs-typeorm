@@ -14,27 +14,26 @@ import { changePasswordDTO } from './dto/change.password.dto';
 
 @Controller('user')
 export class UserController {
-    constructor(private readonly UserService: UserService) {
-    }
+    constructor(private readonly UserService: UserService) {}
 
-    @Get("/")
+    @Get()
     async findAll(@Query() params: FindReqBody) {
-        return this.UserService.findAll(params);
+        return await this.UserService.findAll(params);
     }
 
-    @Post("/")
+    @Post()
     async create(@Body() body: UserDTO) {
         return this.UserService.create(body);
     }
 
-    @Put("/")
+    @Put()
     async update(@Body() body: UserDTO) {
         return this.UserService.update(body);
     }
 
-    @Delete("/")
-    async deleted(@Body() body: UserDTO) {
-        return this.UserService.deleted(body);
+    @Delete()
+    async deleted(@Body('ids') ids: string[]) {
+        return this.UserService.deleted({ ids });
     }
 
     @Put('change-pass')

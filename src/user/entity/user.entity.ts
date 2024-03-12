@@ -1,6 +1,14 @@
-import { Column, Entity, IsNull, OneToMany } from 'typeorm';
+import {
+    BeforeInsert,
+    BeforeUpdate,
+    Column,
+    Entity,
+    OneToMany,
+} from 'typeorm';
 import { BaseEntity } from '../../common';
 import { BlogEntity } from '../../blog/entity/blog.entity';
+import * as bcrypt from 'bcrypt';
+import { Roles } from '../../common/enum/roles.enum';
 
 @Entity({ name: 'user' })
 export class UserEntity extends BaseEntity {
@@ -24,7 +32,7 @@ export class UserEntity extends BaseEntity {
 
     @Column({
         type: 'enum',
-        enum: ['ADMIN', 'STAFF', 'CUSTOMER'],
+        enum: Roles,
     })
     roles: string[];
 
@@ -36,4 +44,14 @@ export class UserEntity extends BaseEntity {
 
     @OneToMany(() => BlogEntity, (blog) => blog.user)
     blog: BlogEntity[];
+
+    @BeforeInsert()
+    async hashPasswordCreate() {
+        this.password = await bcrypt.hash(this.password.toString(), 10);
+    }
+
+    @BeforeUpdate()
+    async hashPasswordUpdate() {
+        this.password = await bcrypt.hash(this.password.toString(), 10);
+    }
 }

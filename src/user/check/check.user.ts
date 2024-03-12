@@ -14,7 +14,6 @@ export class checkUser {
     public async checkExitsUser(params: { id?: string; email?: string }) {
         const where = {
             email: params.email,
-            is_deleted: false,
             is_active: true,
         };
 

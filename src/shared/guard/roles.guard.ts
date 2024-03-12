@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, HttpException, Injectable } from '@nestjs/common';
+import {
+    CanActivate,
+    ExecutionContext,
+    HttpException,
+    Injectable,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Roles } from './roles.decorator';
 import { Request } from 'express';
@@ -6,12 +11,11 @@ import { HttpsStatus } from '../../common/constant';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-    constructor(private readonly reflector: Reflector) {
-    }
+    constructor(private readonly reflector: Reflector) {}
 
     canActivate(context: ExecutionContext): boolean {
         //TODO: Su dung role nhan vao tu @Roles(['']) ben phia controller
-        const roles = this.reflector.get(Roles, context.getHandler()) //TODO: Lấy roles từ @Roles[]
+        const roles = this.reflector.get(Roles, context.getHandler()); //TODO: Lấy roles từ @Roles[]
 
         //TODO: Nếu không được đánh dấu là Role nào thì tiếp tục chạy
         if (!roles) {
