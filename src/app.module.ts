@@ -16,6 +16,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './shared/guard';
 import { UserController } from './user/user.controller';
 import { AuthController } from './auth/auth.controller';
+import { ImageModule } from './image/image.module';
 
 @Module({
     imports: [
@@ -29,6 +30,7 @@ import { AuthController } from './auth/auth.controller';
         BlogModule,
         CategoryModule,
         AuthModule,
+        ImageModule,
     ],
     controllers: [UserController, AuthController],
     providers: [

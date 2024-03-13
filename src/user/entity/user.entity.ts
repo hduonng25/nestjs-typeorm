@@ -1,10 +1,4 @@
-import {
-    BeforeInsert,
-    BeforeUpdate,
-    Column,
-    Entity,
-    OneToMany,
-} from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../common';
 import { BlogEntity } from '../../blog/entity/blog.entity';
 import * as bcrypt from 'bcrypt';

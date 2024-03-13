@@ -9,11 +9,11 @@ export class BlogDTO extends BaseDTO {
     content: string;
 
     @Expose()
-    user: DeepPartial<UserEntity>;
+    user: UserEntity;
 
     @Expose()
     avatar: string;
 
     @Exclude()
-    category: DeepPartial<CategoryEntity>;
+    category: CategoryEntity;
 }

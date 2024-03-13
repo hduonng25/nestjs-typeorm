@@ -164,3 +164,16 @@ export const commonError = (params: {
         ],
     };
 };
+
+export const error = {
+    actionNotAllowed,
+    methodNotAllowed,
+    exception,
+    syntax,
+    services,
+    invalidData,
+    urlNotFound,
+    notFound,
+    commonError,
+    database,
+};

@@ -1,15 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { FindManyOptions, Repository } from 'typeorm';
 import { UserEntity } from './entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseService } from '../shared/type-orm';
 import { UserDTO } from './dto/user.dto';
 import { FindReqBody } from '../shared/interface';
-import { Result, success, error } from '../shared/result';
+import { Result, success, error, ResultError } from '../shared/result';
 import { plainToInstance } from 'class-transformer';
 import { changePasswordDTO } from './dto/change.password.dto';
 import { checkUser } from './check/check.user';
 import * as bcrypt from 'bcrypt';
+import { HttpsStatus } from '../common/constant';
 
 @Injectable()
 export class UserService extends BaseService {
@@ -45,6 +46,22 @@ export class UserService extends BaseService {
             totalPage,
             result,
         });
+    }
+
+    async findOne(id: string): Promise<UserEntity> {
+        const user = await this.UserRepository.findOne({
+            where: { id: id },
+            select: ['id', 'full_name', 'age'],
+        });
+
+        if (user) {
+            return user;
+        } else {
+            throw new HttpException(
+                'User not found',
+                HttpsStatus.INTERNAL_SERVER,
+            );
+        }
     }
 
     async create(params: UserDTO): Promise<Result> {
