@@ -8,41 +8,40 @@ import {
     Query,
     Req,
 } from '@nestjs/common';
-import { BlogService } from './blog.service';
+import { PostService } from './post.service';
 import { FindReqBody } from '../shared/interface';
-import { CreateBlogDTO, UpdateBlogDTO } from './dto/blog.body.dto';
 import { Request } from 'express';
 import { UserService } from '../user/user.service';
-import { BlogDTO } from './dto/blog.dto';
+import { PostDto } from './dto/post.dto';
+import { CreatePostDTO, UpdatePostDTO } from './dto/post.body.dto';
 
-@Controller('blog')
-export class BlogController {
+@Controller('post')
+export class PostController {
     constructor(
-        private readonly BlogService: BlogService,
+        private readonly PostService: PostService,
         private readonly UserService: UserService,
-    ) {
-    }
+    ) {}
 
     @Get()
     async findAll(@Query() params: FindReqBody) {
-        return this.BlogService.findAll(params);
+        return this.PostService.findAll(params);
     }
 
     @Post()
-    async createBlog(@Req() req: Request, @Body() body: CreateBlogDTO) {
+    async create(@Req() req: Request, @Body() body: CreatePostDTO) {
         const user = await this.UserService.findOne(req.payload.id);
-        const blogDTO = {
+        const postDTO = {
             user,
             ...body,
-        } as unknown as BlogDTO;
+        } as unknown as PostDto;
 
-        return this.BlogService.create(blogDTO);
+        return this.PostService.create(postDTO);
     }
 
     @Put()
-    async updateBlog(@Body() body: UpdateBlogDTO, @Req() req: Request) {
+    async update(@Body() body: UpdatePostDTO, @Req() req: Request) {
         const user_id = req.payload.id;
-        return this.BlogService.update({
+        return this.PostService.update({
             dto: body,
             user: user_id,
         });
@@ -50,7 +49,7 @@ export class BlogController {
 
     @Delete()
     async deleted(@Body('ids') ids: string[], @Req() req: Request) {
-        return this.BlogService.deleted({
+        return this.PostService.deleted({
             ids: ids,
             user_id: req.payload.id,
         });

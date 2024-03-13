@@ -1,7 +1,7 @@
 import { BaseDTO } from '../../common';
 import { CategoryEntity } from '../../category/entity/category.entity';
 
-export class CreateBlogDTO extends BaseDTO {
+export class CreatePostDTO extends BaseDTO {
     category?: string;
 
     content: string;
@@ -9,7 +9,7 @@ export class CreateBlogDTO extends BaseDTO {
     avatar?: string;
 }
 
-export class UpdateBlogDTO extends BaseDTO {
+export class UpdatePostDTO extends BaseDTO {
     content?: string;
 
     category?: CategoryEntity;

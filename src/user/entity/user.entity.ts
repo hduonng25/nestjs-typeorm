@@ -1,8 +1,8 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../common';
-import { BlogEntity } from '../../blog/entity/blog.entity';
 import * as bcrypt from 'bcrypt';
 import { Roles } from '../../common/enum/roles.enum';
+import { PostEntity } from '../../post/entity/post.entity';
 
 @Entity({ name: 'user' })
 export class UserEntity extends BaseEntity {
@@ -36,8 +36,8 @@ export class UserEntity extends BaseEntity {
     @Column({ type: 'datetime', nullable: true })
     last_locked: Date;
 
-    @OneToMany(() => BlogEntity, (blog) => blog.user)
-    blog: BlogEntity[];
+    @OneToMany(() => PostEntity, (post) => post.user)
+    post: PostEntity[];
 
     @BeforeInsert()
     async hashPasswordCreate() {

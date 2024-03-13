@@ -7,7 +7,6 @@ import {
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { configs, withCache } from './configs';
-import { BlogModule } from './blog/blog.module';
 import { CategoryModule } from './category/category.module';
 import { AuthModule } from './auth/auth.module';
 import { CheckTokenReq } from './auth/check/check.token.request';
@@ -17,6 +16,7 @@ import { RolesGuard } from './shared/guard';
 import { UserController } from './user/user.controller';
 import { AuthController } from './auth/auth.controller';
 import { ImageModule } from './image/image.module';
+import { PostModule } from './post/post.module';
 
 @Module({
     imports: [
@@ -27,7 +27,7 @@ import { ImageModule } from './image/image.module';
 
         TypeOrmModule.forRoot(withCache),
         UserModule,
-        BlogModule,
+        PostModule,
         CategoryModule,
         AuthModule,
         ImageModule,

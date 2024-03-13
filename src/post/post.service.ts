@@ -1,21 +1,21 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { BaseService } from '../shared/type-orm';
-import { BlogEntity } from './entity/blog.entity';
+import { PostEntity } from './entity/post.entity';
 import { FindReqBody } from '../shared/interface';
 import { FindManyOptions, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Result, success, error } from '../shared/result';
-import { BlogDTO } from './dto/blog.dto';
+import { PostDto } from './dto/post.dto';
 import { HttpsStatus } from '../common/constant';
 import { UserService } from '../user/user.service';
-import { UpdateBlogDTO } from './dto/blog.body.dto';
 import { plainToInstance } from 'class-transformer';
+import { UpdatePostDTO } from './dto/post.body.dto';
 
 @Injectable()
-export class BlogService extends BaseService {
+export class PostService extends BaseService {
     constructor(
-        @InjectRepository(BlogEntity)
-        protected readonly BlogRepository: Repository<BlogEntity>,
+        @InjectRepository(PostEntity)
+        protected readonly PostRepository: Repository<PostEntity>,
         private readonly UserService: UserService,
     ) {
         super();
@@ -26,7 +26,7 @@ export class BlogService extends BaseService {
         const size = params.size > 0 ? params.size : 10;
         const skip = (params.page - 1) * params.size;
 
-        const findManyOptions: FindManyOptions<BlogEntity> = {
+        const findManyOptions: FindManyOptions<PostEntity> = {
             take: params.size,
             skip,
             select: ['id', 'avatar', 'content', 'user', 'created_date'],
@@ -34,7 +34,7 @@ export class BlogService extends BaseService {
         };
 
         const [result, total] =
-            await this.BlogRepository.findAndCount(findManyOptions);
+            await this.PostRepository.findAndCount(findManyOptions);
 
         const totalPage = Math.ceil(total / params.size);
 
@@ -47,16 +47,15 @@ export class BlogService extends BaseService {
         });
     }
 
-    async create(params: BlogDTO): Promise<Result> {
+    async create(params: PostDto): Promise<Result> {
         try {
-            await this.BlogRepository.insert(params);
-            const result = plainToInstance(BlogDTO, params, {
+            await this.PostRepository.insert(params);
+            const result = plainToInstance(PostDto, params, {
                 excludeExtraneousValues: true,
             });
 
             return success.ok(result);
-        }
-        catch (e) {
+        } catch (e) {
             throw new HttpException(
                 'Invalid server',
                 HttpsStatus.INTERNAL_SERVER,
@@ -68,45 +67,45 @@ export class BlogService extends BaseService {
         const user = await this.UserService.findOne(params.user_id);
 
         for (let id of params.ids) {
-            const blog = await this.BlogRepository.findOne({
+            const post = await this.PostRepository.findOne({
                 where: { id: id },
                 relations: ['user'],
             });
 
-            if (!user.roles.some(role => role.includes('ADMIN')) && user.id !== blog.id) {
+            if (
+                !user.roles.some((role) => role.includes('ADMIN')) &&
+                user.id !== post.id
+            ) {
                 return error.commonError({
                     location: 'user',
                     param: 'authen',
                     message: 'You do not have permission to delete this post',
                 });
-            }
-            else {
-                await this.BlogRepository.softDelete(id);
+            } else {
+                await this.PostRepository.softDelete(id);
             }
         }
 
-        return success.ok({ mess: 'Delete blog successfuly' });
-
+        return success.ok({ mess: 'Delete successfuly' });
     }
 
     async update(params: {
-        dto: UpdateBlogDTO;
+        dto: UpdatePostDTO;
         user: string;
     }): Promise<Result> {
         const user = await this.UserService.findOne(params.user);
-        const blog = await this.BlogRepository.findOne({
+        const post = await this.PostRepository.findOne({
             where: { id: params.dto.id },
         });
-        if (user.id !== blog.user.id) {
+        if (user.id !== post.user.id) {
             return error.commonError({
                 location: 'user',
                 param: 'authen',
                 message: 'You do not have permission to edit this post',
             });
-        }
-        else {
-            await this.BlogRepository.update(blog.id, params.dto);
-            const result = plainToInstance(BlogDTO, blog, {
+        } else {
+            await this.PostRepository.update(post.id, params.dto);
+            const result = plainToInstance(PostDto, post, {
                 excludeExtraneousValues: true,
             });
             return success.ok({ mess: 'Update successfuly', ...result });
