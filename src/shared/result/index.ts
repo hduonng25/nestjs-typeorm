@@ -1,3 +1,5 @@
 export * from './result';
-export * as error from './error';
-export * as success from './success';
+export * from './error';
+export * from './success';
+
+

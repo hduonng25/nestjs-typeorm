@@ -13,11 +13,18 @@ export class BlogEntity extends BaseEntity {
     })
     avatar: string;
 
-    @ManyToOne(() => UserEntity, (user) => user.blog)
+    @Column({ nullable: true })
+    parent_id: string;
+
+    @ManyToOne(() => UserEntity, (user) => user.blog, {
+        eager: true,
+        lazy: false,
+    })
     user: UserEntity;
 
     @ManyToOne(() => CategoryEntity, (category) => category.blog, {
         nullable: true,
+        eager: true,
     })
     category: CategoryEntity;
 }

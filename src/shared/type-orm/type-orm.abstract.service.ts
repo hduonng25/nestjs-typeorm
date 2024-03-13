@@ -2,11 +2,19 @@ import { FindReqBody } from '../interface';
 import { Result } from '../result';
 
 export abstract class BaseService {
-    abstract findAll(params: FindReqBody): Promise<Result>;
+    async findAll(params: FindReqBody): Promise<Result> {
+        return Promise.resolve(undefined);
+    }
 
-    abstract create(params: object | Record<string, string>): Promise<Result>;
+    async create(params: object | Record<string, string>): Promise<Result> {
+        return Promise.resolve(undefined);
+    }
 
-    abstract update(params: object | Record<string, string>): Promise<Result>;
+    async update(params: object | Record<string, string>): Promise<Result> {
+        return Promise.resolve(undefined);
+    }
 
-    abstract deleted(params: object | Record<string, string>): Promise<Result>;
+    async deleted(params: object | Record<string, string>): Promise<Result> {
+        return Promise.resolve(undefined);
+    }
 }

@@ -18,3 +18,5 @@ export const noContent = (): ResultSuccess => {
         data: undefined,
     };
 };
+
+export const success = { ok, created, noContent };
