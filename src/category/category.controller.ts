@@ -13,8 +13,7 @@ import { CreateCategoryDTO, UpdateCategoryDTO } from './dto/category.body.dto';
 
 @Controller('category')
 export class CategoryController {
-    constructor(private readonly CategoryService: CategoryService) {
-    }
+    constructor(private readonly CategoryService: CategoryService) {}
 
     @Get()
     async findAll(@Query() parmas: FindReqBody) {
@@ -35,5 +34,4 @@ export class CategoryController {
     async deleted(@Body('ids') ids: string[]) {
         return this.CategoryService.deleted({ ids });
     }
-
 }

@@ -1,11 +1,11 @@
 import { BaseDTO } from '../../common';
 import { Exclude, Expose } from 'class-transformer';
-import { BlogEntity } from '../../blog/entity/blog.entity';
+import { PostEntity } from '../../post/entity/post.entity';
 
 export class CategoryDTO extends BaseDTO {
     @Expose()
     name: string;
 
     @Exclude()
-    blog: BlogEntity[];
+    post: PostEntity[];
 }

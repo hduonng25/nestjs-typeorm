@@ -7,7 +7,6 @@ import {
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { configs, withCache } from './configs';
-import { BlogModule } from './blog/blog.module';
 import { CategoryModule } from './category/category.module';
 import { AuthModule } from './auth/auth.module';
 import { CheckTokenReq } from './auth/check/check.token.request';
@@ -17,6 +16,8 @@ import { RolesGuard } from './shared/guard';
 import { UserController } from './user/user.controller';
 import { AuthController } from './auth/auth.controller';
 import { ImageModule } from './image/image.module';
+import { PostModule } from './post/post.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
     imports: [
@@ -27,10 +28,11 @@ import { ImageModule } from './image/image.module';
 
         TypeOrmModule.forRoot(withCache),
         UserModule,
-        BlogModule,
+        PostModule,
         CategoryModule,
         AuthModule,
         ImageModule,
+        CommentModule,
     ],
     controllers: [UserController, AuthController],
     providers: [
@@ -56,6 +58,10 @@ export class AppModule implements NestModule {
                 {
                     path: configs.exclude.user.create,
                     method: RequestMethod.POST,
+                },
+                {
+                    path: 'blog/home/',
+                    method: RequestMethod.GET,
                 },
             )
             .forRoutes('*');

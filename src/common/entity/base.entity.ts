@@ -11,15 +11,15 @@ export abstract class BaseEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @CreateDateColumn()
+    @CreateDateColumn({ select: true })
     created_date: Date;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ select: true })
     updated_date: Date;
 
-    @DeleteDateColumn({ nullable: true })
+    @DeleteDateColumn({ nullable: true, select: true })
     deleted_at: Date;
 
-    @Column({ default: true })
+    @Column({ default: true, select: true })
     is_active: boolean;
 }
