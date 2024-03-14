@@ -17,6 +17,7 @@ import { UserController } from './user/user.controller';
 import { AuthController } from './auth/auth.controller';
 import { ImageModule } from './image/image.module';
 import { PostModule } from './post/post.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
     imports: [
@@ -31,6 +32,7 @@ import { PostModule } from './post/post.module';
         CategoryModule,
         AuthModule,
         ImageModule,
+        CommentModule,
     ],
     controllers: [UserController, AuthController],
     providers: [
@@ -56,6 +58,10 @@ export class AppModule implements NestModule {
                 {
                     path: configs.exclude.user.create,
                     method: RequestMethod.POST,
+                },
+                {
+                    path: 'blog/home/',
+                    method: RequestMethod.GET,
                 },
             )
             .forRoutes('*');

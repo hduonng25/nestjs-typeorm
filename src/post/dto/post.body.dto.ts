@@ -1,8 +1,8 @@
 import { BaseDTO } from '../../common';
 import { CategoryEntity } from '../../category/entity/category.entity';
 
-export class CreatePostDTO extends BaseDTO {
-    category?: string;
+export interface CreatePostDTO extends BaseDTO {
+    category_id?: string;
 
     content: string;
 

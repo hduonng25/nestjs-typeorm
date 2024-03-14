@@ -1,7 +1,9 @@
 import { BaseEntity } from '../../common';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { UserEntity } from '../../user/entity/user.entity';
 import { CategoryEntity } from '../../category/entity/category.entity';
+import { NormalEntity } from '../../comment/nomal/entity/normal.entity';
+import { ReplyEntity } from '../../comment/reply/entity/reply.entity';
 
 @Entity({ name: 'post' })
 export class PostEntity extends BaseEntity {
@@ -12,9 +14,6 @@ export class PostEntity extends BaseEntity {
         nullable: true,
     })
     avatar: string;
-
-    @Column({ nullable: true })
-    parent_id: string;
 
     @ManyToOne(() => UserEntity, (user) => user.post, {
         eager: true,
@@ -27,4 +26,10 @@ export class PostEntity extends BaseEntity {
         eager: true,
     })
     category: CategoryEntity;
+
+    @OneToMany(() => NormalEntity, (normal) => normal.post)
+    normal_comment: NormalEntity[];
+
+    @OneToMany(() => ReplyEntity, (reply) => reply.post)
+    reply_comment: ReplyEntity[];
 }

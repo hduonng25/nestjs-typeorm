@@ -80,4 +80,18 @@ export class CategoryService implements BaseService {
             });
         }
     }
+
+    async findOne(id: string): Promise<CategoryEntity> {
+        const category = await this.CategoryRepository.findOne({
+            where: { id: id },
+        });
+        if (category) {
+            return category;
+        } else {
+            throw new HttpException(
+                'Category not found',
+                HttpsStatus.INTERNAL_SERVER,
+            );
+        }
+    }
 }
