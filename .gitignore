@@ -10,4 +10,5 @@
 **/tsconfig.json
 **/.eslintcache
 **/.vscode
+**/.editorconfig
 *.local
