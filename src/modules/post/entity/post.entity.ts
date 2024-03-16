@@ -12,18 +12,19 @@ export class PostEntity extends BaseEntity {
 
     @Column({
         nullable: true,
+        default: null,
     })
-    avatar: string;
+    thumbnail: string;
 
     @ManyToOne(() => UserEntity, (user) => user.post, {
-        eager: true,
+        eager: false,
         lazy: false,
     })
     user: UserEntity;
 
     @ManyToOne(() => CategoryEntity, (category) => category.post, {
         nullable: true,
-        eager: true,
+        eager: false,
     })
     category: CategoryEntity;
 

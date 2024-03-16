@@ -14,12 +14,32 @@ import { HttpsStatus } from '../../common/constant';
 
 @Injectable()
 export class UserService extends BaseService {
+    private random: () => string;
+    private codeRanDom: string;
+
     constructor(
         @InjectRepository(UserEntity)
         protected readonly UserRepository: Repository<UserEntity>,
         private readonly checkUser: checkUser,
     ) {
+
         super();
+
+        this.random = () => {
+            const length = 8;
+            const characters =
+                'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let ranDom = '';
+            const charactersLength = characters.length;
+
+            for (let i = 0; i < length; i++) {
+                ranDom += characters.charAt(
+                    Math.floor(Math.random() * charactersLength),
+                );
+            }
+
+            return ranDom;
+        };
     }
 
     async findAll(params: FindReqBody): Promise<Result> {
@@ -51,7 +71,14 @@ export class UserService extends BaseService {
     async findOne(id: string): Promise<UserEntity> {
         const user = await this.UserRepository.findOne({
             where: { id: id },
-            select: ['id', 'full_name', 'age', 'first_name', 'last_name', 'email'],
+            select: [
+                'id',
+                'full_name',
+                'age',
+                'first_name',
+                'last_name',
+                'email',
+            ],
         });
         if (user) {
             return user;
@@ -134,8 +161,31 @@ export class UserService extends BaseService {
         return success.ok('Deleted successfully');
     }
 
-    async uploadAvatar(params: { id: string, avatar: string }) {
+    async uploadAvatar(params: { id: string; avatar: string }) {
         await this.UserRepository.update(params.id, { avatar: params.avatar });
+    }
+
+    async genCodeRanDom(id: string) {
+        const user = await this.UserRepository.findOne({ where: { id: id } });
+        if (user) {
+            this.codeRanDom = this.random();
+        }
+        else {
+            return error.notFound({});
+        }
+    }
+
+    async checkRanDomCode(code: string) {
+        if (code === this.codeRanDom) {
+            return;
+        }
+        else {
+            return error.commonError({
+                location: 'code',
+                param: 'code',
+                message: `code ${code} wrong`,
+            });
+        }
     }
 
     async changePassword(params: changePasswordDTO): Promise<Result> {

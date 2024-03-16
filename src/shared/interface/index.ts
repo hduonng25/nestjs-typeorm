@@ -6,4 +6,6 @@ export class FindReqBody {
 
     @IsNotEmpty()
     size: number;
+
+    query: string;
 }

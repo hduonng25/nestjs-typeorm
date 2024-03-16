@@ -13,7 +13,6 @@ import { UserModule } from './modules/user/user.module';
 import { PostModule } from './modules/post/post.module';
 import { CategoryModule } from './modules/category/category.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { ImageModule } from './modules/image/image.module';
 import { CommentModule } from './modules/comment/comment.module';
 import { UserController } from './modules/user/user.controller';
 import { AuthController } from './modules/auth/auth.controller';
@@ -31,7 +30,6 @@ import { CheckTokenReq } from './modules/auth/check/check.token.request';
         PostModule,
         CategoryModule,
         AuthModule,
-        ImageModule,
         CommentModule,
     ],
     controllers: [UserController, AuthController],

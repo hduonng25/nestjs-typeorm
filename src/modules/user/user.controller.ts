@@ -3,9 +3,14 @@ import {
     Controller,
     Delete,
     Get,
+    HttpException,
+    HttpStatus,
     Post,
     Put,
-    Query, Req, UploadedFile, UseInterceptors,
+    Query,
+    Req,
+    UploadedFile,
+    UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDTO } from './dto/user.dto';
@@ -14,6 +19,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 import { FindReqBody } from '../../shared/interface';
 import { StorageConfigs } from '../../configs';
+import { extname } from 'path';
+import { FileEnum } from '../../common/enum/image.enum';
 
 @Controller('user')
 export class UserController {
@@ -45,19 +52,64 @@ export class UserController {
         return this.UserService.deleted({ ids });
     }
 
+    @UseInterceptors(
+        FileInterceptor('avatar', {
+            storage: StorageConfigs('user'),
+            fileFilter(
+                req: Request,
+                file: Express.Multer.File,
+                callback: (error: Error | null, acceptFile: boolean) => void,
+            ) {
+                const ext = extname(file.originalname);
+                if (!FileEnum.includes(ext)) {
+                    req.validateFile = `Wrong extention type. Accepted file ext are: ${FileEnum}`;
+                    callback(null, false);
+                }
+                else {
+                    const fileSize = parseInt(req.headers['content-length']);
+                    if (fileSize > 1024 * 1024 * 5) {
+                        req.validateFile = `Wrong extention type. Accepted file ext are: ${FileEnum}`;
+                        callback(null, false);
+                    }
+                    else {
+                        callback(null, true);
+                    }
+                }
+            },
+        }),
+    )
+    @Post('upload-avatar')
+    async uploadAvatar(
+        @Req() req: Request,
+        @UploadedFile() file: Express.Multer.File,
+    ) {
+        if (req.validateFile) {
+            throw new HttpException(req.validateFile, HttpStatus.BAD_REQUEST);
+        }
+        else if (!file) {
+            throw new HttpException('File is required', HttpStatus.BAD_REQUEST);
+        }
+        else {
+            const data = {
+                id: req.payload.id,
+                avatar: file.destination + '/' + file.filename,
+            };
+            return this.UserService.uploadAvatar({ ...data });
+        }
+    }
+
+    @Post('random')
+    async randomCode(@Req() req: Request) {
+        return this.UserService.genCodeRanDom(req.payload.id);
+    }
+
+    @Post('check-code')
+    async checkCode(@Req() req: Request) {
+        return this.UserService.checkRanDomCode(req.body.code);
+    }
+
     @Put('change-pass')
     async changePassword(@Body() body: changePasswordDTO) {
         return this.UserService.changePassword(body);
-    }
-
-    @UseInterceptors(FileInterceptor('avatar', { storage: StorageConfigs('avatar') }))
-    @Post('upload-avatar')
-    async uploadAvatar(@Req() req: Request,
-                       @UploadedFile() file: Express.Multer.File) {
-        const data = {
-            id: req.payload.id,
-            avatar: file.destination + '/' + file.filename,
-        };
-        return this.UserService.uploadAvatar({ ...data });
     }
 }
