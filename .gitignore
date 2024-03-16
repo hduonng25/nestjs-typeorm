@@ -11,4 +11,5 @@
 **/.eslintcache
 **/.vscode
 **/.editorconfig
+**/upload
 *.local

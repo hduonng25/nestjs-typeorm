@@ -14,7 +14,9 @@ export class NormalEntity extends BaseEntity {
     })
     reply_comment: ReplyEntity[];
 
-    @ManyToOne(() => UserEntity, (user) => user.normal_comment, { eager: true })
+    @ManyToOne(() => UserEntity, (user) => user.normal_comment, {
+        eager: false,
+    })
     user: UserEntity;
 
     @ManyToOne(() => PostEntity, (post) => post.normal_comment)

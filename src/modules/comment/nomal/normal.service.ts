@@ -21,13 +21,22 @@ export class NormalService {
 
     async getByPost(params: { post_id: string }) {
         const post = await this.PostService.findOne(params.post_id);
-        const normal_comment =
-            await this.NormalCommentRepository.createQueryBuilder('comment')
-                .select(['comment.id', 'comment.content'])
-                .addSelect(['user.id', 'user.full_name', 'user.email'])
-                .leftJoin('comment.user', 'user')
-                .where('comment.postId = :postId', { postId: post.id })
-                .getMany();
+        const normal_comment = await this.NormalCommentRepository.find({
+            where: { post: { id: post.id } },
+            relations: {
+                user: true,
+            },
+            select: {
+                id: true,
+                content: true,
+                user: {
+                    id: true,
+                    full_name: true,
+                    avatar: true,
+                    email: true,
+                },
+            },
+        });
 
         const result_comment = await Promise.all(
             normal_comment.map(async (item) => {

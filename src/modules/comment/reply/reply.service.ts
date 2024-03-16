@@ -19,14 +19,23 @@ export class ReplyService {
     ) {}
 
     async getByComment(params: { id: string }) {
-        const result = await this.ReplyRepository.createQueryBuilder('reply')
-            .select(['reply.id', 'reply.content'])
-            .addSelect(['user.id', 'user.full_name', 'user.email'])
-            .leftJoin('reply.user', 'user')
-            .where('reply.normalCommentId = :normalCommentId', {
-                normalCommentId: params.id,
-            })
-            .getMany();
+        const result = await this.ReplyRepository.find({
+            where: { normal_comment: { id: params.id } },
+            relations: {
+                user: true,
+                normal_comment: true,
+            },
+            select: {
+                id: true,
+                content: true,
+                user: {
+                    id: true,
+                    full_name: true,
+                    email: true,
+                    avatar: true,
+                },
+            },
+        });
 
         return result;
     }

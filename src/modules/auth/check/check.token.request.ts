@@ -8,6 +8,7 @@ import { configs } from '../../../configs';
 declare module 'express-serve-static-core' {
     interface Request {
         payload?: Payload;
+        validateFile: string;
         request_id: string;
         correlation_id?: string;
         requested_time?: number;

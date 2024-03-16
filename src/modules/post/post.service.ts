@@ -1,6 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { PostEntity } from './entity/post.entity';
-import { FindManyOptions, Repository } from 'typeorm';
+import { FindManyOptions, Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostDto } from './dto/post.dto';
 import { UserService } from '../user/user.service';
@@ -29,9 +29,37 @@ export class PostService extends BaseService {
         const skip = (params.page - 1) * params.size;
 
         const findManyOptions: FindManyOptions<PostEntity> = {
+            where: [
+                {
+                    content: Like('%' + params.query + '%'),
+                },
+            ],
+
             take: params.size,
+
             skip,
-            select: ['id', 'avatar', 'content', 'user', 'created_date', 'user'],
+
+            relations: {
+                user: true,
+                category: true,
+            },
+            select: {
+                id: true,
+                thumbnail: true,
+                content: true,
+                created_date: true,
+                user: {
+                    id: true,
+                    full_name: true,
+                    email: true,
+                    avatar: true,
+                    password: false,
+                },
+                category: {
+                    id: true,
+                    name: true,
+                },
+            },
             order: { created_date: 'DESC' },
         };
 
@@ -53,14 +81,21 @@ export class PostService extends BaseService {
         const user = await this.UserService.findOne(id);
         if (user) {
             const findManyOptions: FindManyOptions<PostEntity> = {
-                select: [
-                    'id',
-                    'avatar',
-                    'content',
-                    'user',
-                    'created_date',
-                    'user',
-                ],
+                relations: {
+                    user: true,
+                },
+                select: {
+                    id: true,
+                    content: true,
+                    thumbnail: true,
+                    created_date: true,
+                    user: {
+                        id: true,
+                        email: true,
+                        full_name: true,
+                        avatar: true,
+                    },
+                },
                 order: { created_date: 'DESC' },
             };
 
@@ -72,6 +107,7 @@ export class PostService extends BaseService {
     async create(params: {
         dto: CreatePostDTO;
         is_user: string;
+        thumbnail: string;
     }): Promise<Result> {
         try {
             const category = await this.CategoryService.findOne(
@@ -82,6 +118,7 @@ export class PostService extends BaseService {
                 user,
                 category,
                 ...params.dto,
+                thumbnail: params.thumbnail,
             };
 
             await this.PostRepository.insert(create);
@@ -90,8 +127,7 @@ export class PostService extends BaseService {
             });
 
             return success.ok(result);
-        }
-        catch (e) {
+        } catch (e) {
             throw new HttpException(
                 'Invalid server',
                 HttpsStatus.INTERNAL_SERVER,
@@ -117,8 +153,7 @@ export class PostService extends BaseService {
                     param: 'authen',
                     message: 'You do not have permission to delete this post',
                 });
-            }
-            else {
+            } else {
                 await this.PostRepository.softDelete(id);
             }
         }
@@ -129,6 +164,7 @@ export class PostService extends BaseService {
     async update(params: {
         dto: UpdatePostDTO;
         user: string;
+        thumbnail: string;
     }): Promise<Result> {
         const user = await this.UserService.findOne(params.user);
         const post = await this.PostRepository.findOne({
@@ -140,9 +176,13 @@ export class PostService extends BaseService {
                 param: 'authen',
                 message: 'You do not have permission to edit this post',
             });
-        }
-        else {
-            await this.PostRepository.update(post.id, params.dto);
+        } else {
+            const update = {
+                ...params.dto,
+                thumbnail: params.thumbnail,
+            } as UpdatePostDTO;
+
+            await this.PostRepository.update(post.id, update);
             const result = plainToInstance(PostDto, post, {
                 excludeExtraneousValues: true,
             });
@@ -152,14 +192,14 @@ export class PostService extends BaseService {
 
     async getByCategory(id: string): Promise<PostEntity[]> {
         try {
-            let result = await this.PostRepository.find({ where: { category: { id: id } } });
-            return result
-        }
-        catch (e) {
+            let result = await this.PostRepository.find({
+                where: { category: { id: id } },
+            });
+            return result;
+        } catch (e) {
             throw e;
         }
     }
-
 
     //External
     async findOne(id: string): Promise<PostEntity> {
@@ -169,8 +209,7 @@ export class PostService extends BaseService {
 
         if (post) {
             return post;
-        }
-        else {
+        } else {
             throw new HttpException(
                 'Post not found',
                 HttpsStatus.INTERNAL_SERVER,

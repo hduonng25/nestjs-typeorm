@@ -6,6 +6,8 @@ export interface CreatePostDTO extends BaseDTO {
 
     content: string;
 
+    thumbnail?: string;
+
     avatar?: string;
 }
 
@@ -15,6 +17,8 @@ export class UpdatePostDTO extends BaseDTO {
     category?: CategoryEntity;
 
     avatar?: string;
+
+    thumbnail: string;
 
     user_id: string;
 }
