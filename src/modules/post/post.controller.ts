@@ -18,9 +18,7 @@ import { CreatePostDTO, UpdatePostDTO } from './dto/post.body.dto';
 import { FindReqBody } from '../../shared/interface';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { StorageConfigs } from '../../configs';
-import { extname } from 'path';
-import { FileEnum } from '../../common/enum/image.enum';
-import { HttpsStatus } from '../../common/constant';
+import { fileFilter } from '../../common/imgUpload/img.filter';
 
 @Controller('post')
 export class PostController {
@@ -45,25 +43,7 @@ export class PostController {
     @UseInterceptors(
         FileInterceptor('thumbnail', {
             storage: StorageConfigs('post'),
-            fileFilter(
-                req: Request,
-                file: Express.Multer.File,
-                callback: (error: Error | null, acceptFile: boolean) => void,
-            ) {
-                const ext = extname(file.originalname);
-                if (!FileEnum.includes(ext)) {
-                    req.validateFile = `Wrong extention type. Accepted file ext are: ${FileEnum}`;
-                    callback(null, false);
-                } else {
-                    const fileSize = parseInt(req.headers['content-length']);
-                    if (fileSize > 1024 * 1024 * 5) {
-                        req.validateFile = `Wrong extention type. Accepted file ext are: ${FileEnum}`;
-                        callback(null, false);
-                    } else {
-                        callback(null, true);
-                    }
-                }
-            },
+            fileFilter: fileFilter
         }),
     )
     async create(
@@ -93,7 +73,7 @@ export class PostController {
         @Req() req: Request,
         @UploadedFile() file: Express.Multer.File,
     ) {
-        const user_id = req.payload.id;
+        const user_id: string = req.payload.id;
         return this.PostService.update({
             dto: body,
             user: user_id,
