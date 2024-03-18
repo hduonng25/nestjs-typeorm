@@ -17,8 +17,7 @@ export class AuthService {
         @InjectRepository(UserEntity)
         protected readonly UserRepository: Repository<UserEntity>,
         private readonly token: Token,
-    ) {
-    }
+    ) {}
 
     public async login(params: LoginDTO) {
         try {
@@ -38,8 +37,7 @@ export class AuthService {
                         })
                         .where('id = :id', { id: user.id })
                         .execute();
-                }
-                else if (user.fail_login === numberOfTired) {
+                } else if (user.fail_login === numberOfTired) {
                     const lastLocked = user.last_locked
                         ? user.last_locked
                         : new Date();
@@ -63,15 +61,13 @@ export class AuthService {
                             message:
                                 'Account is temporarily locked for 30 minutes',
                         });
-                    }
-                    else {
+                    } else {
                         await this.UserRepository.update(user.id, {
                             fail_login: 0,
                         });
                     }
                 }
-            }
-            else {
+            } else {
                 return error.commonError({
                     location: 'user',
                     message: 'user not found',
@@ -105,8 +101,7 @@ export class AuthService {
                     roles: user.roles,
                 };
                 return success.ok(data);
-            }
-            else {
+            } else {
                 await this.UserRepository.createQueryBuilder()
                     .update(user)
                     .set({
@@ -121,8 +116,7 @@ export class AuthService {
                     message: 'password wrong',
                 });
             }
-        }
-        catch (e) {
+        } catch (e) {
             throw new HttpException('Faild login', HttpsStatus.INTERNAL_SERVER);
         }
     }
@@ -158,15 +152,13 @@ export class AuthService {
 
                 return success.ok(data);
             }
-        }
-        catch (e) {
+        } catch (e) {
             if (e.name && e.name === 'TokenExpiredError') {
                 throw new HttpException(
                     'Your token expired',
                     HttpsStatus.INTERNAL_SERVER,
                 );
-            }
-            else {
+            } else {
                 throw new HttpException(
                     'Your token is not valid',
                     HttpsStatus.BAD_REQUEST,

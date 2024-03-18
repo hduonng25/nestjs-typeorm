@@ -22,7 +22,6 @@ export class UserService extends BaseService {
         protected readonly UserRepository: Repository<UserEntity>,
         private readonly checkUser: checkUser,
     ) {
-
         super();
 
         this.random = () => {
@@ -82,8 +81,7 @@ export class UserService extends BaseService {
         });
         if (user) {
             return user;
-        }
-        else {
+        } else {
             throw new HttpException(
                 'User not found',
                 HttpsStatus.INTERNAL_SERVER,
@@ -106,8 +104,7 @@ export class UserService extends BaseService {
                 excludeExtraneousValues: true,
             });
             return success.created(result);
-        }
-        else {
+        } else {
             return error.commonError({
                 location: 'user',
                 param: 'email',
@@ -129,8 +126,7 @@ export class UserService extends BaseService {
         if (user) {
             await this.UserRepository.update(params.id, params);
             return success.ok('Update successfully');
-        }
-        else {
+        } else {
             return error.commonError({
                 location: 'user',
                 message: 'User not found',
@@ -149,8 +145,7 @@ export class UserService extends BaseService {
 
             if (user) {
                 await this.UserRepository.softDelete(item);
-            }
-            else {
+            } else {
                 return error.commonError({
                     location: 'user',
                     message: 'User not found',
@@ -169,8 +164,7 @@ export class UserService extends BaseService {
         const user = await this.UserRepository.findOne({ where: { id: id } });
         if (user) {
             this.codeRanDom = this.random();
-        }
-        else {
+        } else {
             return error.notFound({});
         }
     }
@@ -178,8 +172,7 @@ export class UserService extends BaseService {
     async checkRanDomCode(code: string) {
         if (code === this.codeRanDom) {
             return;
-        }
-        else {
+        } else {
             return error.commonError({
                 location: 'code',
                 param: 'code',
@@ -208,16 +201,14 @@ export class UserService extends BaseService {
                 await this.UserRepository.update(params.id, {
                     password: password,
                 });
-            }
-            else {
+            } else {
                 return error.commonError({
                     location: 'password',
                     param: 'password',
                     message: 'Password old wrong',
                 });
             }
-        }
-        else {
+        } else {
             return error.commonError({
                 location: 'user',
                 param: 'id',

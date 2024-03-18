@@ -23,8 +23,7 @@ import { fileFilter } from '../../common';
 
 @Controller('user')
 export class UserController {
-    constructor(private readonly UserService: UserService) {
-    }
+    constructor(private readonly UserService: UserService) {}
 
     @Get()
     async findAll(@Query() params: FindReqBody) {
@@ -54,7 +53,7 @@ export class UserController {
     @UseInterceptors(
         FileInterceptor('avatar', {
             storage: StorageConfigs('user'),
-            fileFilter: fileFilter
+            fileFilter: fileFilter,
         }),
     )
     @Post('upload-avatar')
@@ -64,11 +63,9 @@ export class UserController {
     ) {
         if (req.validateFile) {
             throw new HttpException(req.validateFile, HttpStatus.BAD_REQUEST);
-        }
-        else if (!file) {
+        } else if (!file) {
             throw new HttpException('File is required', HttpStatus.BAD_REQUEST);
-        }
-        else {
+        } else {
             const data = {
                 id: req.payload.id,
                 avatar: file.destination + '/' + file.filename,

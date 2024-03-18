@@ -43,7 +43,7 @@ export class PostController {
     @UseInterceptors(
         FileInterceptor('thumbnail', {
             storage: StorageConfigs('post'),
-            fileFilter: fileFilter
+            fileFilter: fileFilter,
         }),
     )
     async create(
