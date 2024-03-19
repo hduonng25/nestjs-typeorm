@@ -59,13 +59,13 @@ export class PostController {
             return this.PostService.create({
                 dto: body,
                 is_user: req.payload.id,
-                thumbnail: file.destination + '/' + file.filename,
+                thumbnail: file.fieldname + '/' + file.filename,
             });
         }
     }
 
     @UseInterceptors(
-        FileInterceptor('thumbnail', { storage: StorageConfigs('post') }),
+        FileInterceptor('post', { storage: StorageConfigs('post') }),
     )
     @Put()
     async update(

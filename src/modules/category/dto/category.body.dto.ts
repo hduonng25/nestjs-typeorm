@@ -7,7 +7,7 @@ export class CreateCategoryDTO {
 }
 
 export class UpdateCategoryDTO {
-    @Exclude()
+    @Expose()
     id: string;
 
     @Expose()

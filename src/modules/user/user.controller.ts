@@ -52,7 +52,7 @@ export class UserController {
 
     @UseInterceptors(
         FileInterceptor('avatar', {
-            storage: StorageConfigs('user'),
+            storage: StorageConfigs('avatar'),
             fileFilter: fileFilter,
         }),
     )
@@ -66,9 +66,11 @@ export class UserController {
         } else if (!file) {
             throw new HttpException('File is required', HttpStatus.BAD_REQUEST);
         } else {
+            console.log(file);
+            
             const data = {
                 id: req.payload.id,
-                avatar: file.destination + '/' + file.filename,
+                avatar: file.fieldname + '/' + file.filename,
             };
             return this.UserService.uploadAvatar({ ...data });
         }

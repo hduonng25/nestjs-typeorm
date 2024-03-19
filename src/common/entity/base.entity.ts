@@ -2,7 +2,6 @@ import {
     Column,
     CreateDateColumn,
     DeleteDateColumn,
-    PrimaryColumn,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';

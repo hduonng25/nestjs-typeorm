@@ -3,11 +3,12 @@ import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { configs } from './configs';
 import { Logger, ValidationPipe } from '@nestjs/common';
-import cors from 'cors';
+import { join } from 'path';
 
 async function main() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
         logger: ['debug', 'error', 'fatal', 'verbose', 'warn'],
+        cors: true,
     });
 
     const host = configs.app.host;
@@ -26,7 +27,7 @@ async function main() {
     );
 
     app.useBodyParser('json', { limit: configs.main.body_parser_json_limit });
-    app.use(cors());
+    app.useStaticAssets(join(__dirname, '../upload'));
 
     await app.listen(port, host, () => {
         Logger.verbose(`Listening on: ${host}:${port}`);

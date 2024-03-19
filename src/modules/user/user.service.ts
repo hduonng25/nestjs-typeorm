@@ -49,7 +49,13 @@ export class UserService extends BaseService {
         const findManyOptions: FindManyOptions<UserEntity> = {
             take: size,
             skip,
-            select: ['id', 'full_name', 'age', 'email'],
+            select: {
+                id: true,
+                full_name: true,
+                age: true,
+                email: true,
+                avatar: true,
+            },
             order: { created_date: 'DESC' },
         };
 
@@ -70,14 +76,17 @@ export class UserService extends BaseService {
     async findOne(id: string): Promise<UserEntity> {
         const user = await this.UserRepository.findOne({
             where: { id: id },
-            select: [
-                'id',
-                'full_name',
-                'age',
-                'first_name',
-                'last_name',
-                'email',
-            ],
+            select: {
+                id: true,
+                full_name: true,
+                age: true,
+                first_name: true,
+                last_name: true,
+                email: true,
+                roles: true,
+                created_date: true,
+                avatar: true
+            },
         });
         if (user) {
             return user;
