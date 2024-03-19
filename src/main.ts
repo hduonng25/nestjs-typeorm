@@ -4,6 +4,8 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { configs } from './configs';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { join } from 'path';
+import { logger } from './shared/logger/logger';
+import { NextFunction, Request, Response } from 'express';
 
 async function main() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -26,11 +28,16 @@ async function main() {
         }),
     );
 
+    app.use((req: Request, res: Response, next: NextFunction) => {
+        res.header('Access-Control-Allow-Origin', '*');
+        next();
+    });
+
     app.useBodyParser('json', { limit: configs.main.body_parser_json_limit });
     app.useStaticAssets(join(__dirname, '../upload'));
 
     await app.listen(port, host, () => {
-        Logger.verbose(`Listening on: ${host}:${port}`);
+        logger.verbose(`Listening on: ${host}:${port}`);
     });
 }
 

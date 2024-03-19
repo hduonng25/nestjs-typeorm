@@ -30,19 +30,24 @@ export class PostController {
     }
 
     @Get(':id')
+    async getByID(@Query('id') id: string) {
+        return this.PostService.getByID(id);
+    }
+
+    @Get('user/:id')
     async getByUser(@Query('id') id: string) {
         return this.PostService.getByUser(id);
     }
 
-    @Get(':id')
-    async getByCategory(@Query('id') id: string) {
-        return this.PostService.getByCategory(id);
+    @Get('category/:id_category')
+    async getByCategory(@Query('id_category') id_category: string) {
+        return this.PostService.getByCategory(id_category);
     }
 
     @Post()
     @UseInterceptors(
         FileInterceptor('thumbnail', {
-            storage: StorageConfigs('post'),
+            storage: StorageConfigs('thumbnail'),
             fileFilter: fileFilter,
         }),
     )
@@ -65,7 +70,7 @@ export class PostController {
     }
 
     @UseInterceptors(
-        FileInterceptor('post', { storage: StorageConfigs('post') }),
+        FileInterceptor('thumbnail', { storage: StorageConfigs('thumbnail') }),
     )
     @Put()
     async update(
@@ -74,11 +79,20 @@ export class PostController {
         @UploadedFile() file: Express.Multer.File,
     ) {
         const user_id: string = req.payload.id;
-        return this.PostService.update({
-            dto: body,
-            user: user_id,
-            thumbnail: file.destination + '/' + file.filename,
-        });
+        let data: any;
+        if (file) {
+            data = {
+                dto: body,
+                user: user_id,
+                thumbnail: file.fieldname + '/' + file.filename,
+            };
+        } else {
+            data = {
+                dto: body,
+                user: user_id,
+            };
+        }
+        return this.PostService.update(data);
     }
 
     @Delete()

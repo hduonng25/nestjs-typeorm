@@ -66,8 +66,6 @@ export class CategoryService implements BaseService {
     }
 
     async update(params: UpdateCategoryDTO): Promise<Result> {
-        console.log(params);
-        
         const check = await this.CategoryRepository.findOne({
             where: { id: params.id },
         });

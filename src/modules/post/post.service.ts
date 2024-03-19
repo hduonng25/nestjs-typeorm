@@ -31,7 +31,7 @@ export class PostService extends BaseService {
         const findManyOptions: FindManyOptions<PostEntity> = {
             where: [
                 {
-                    content: Like('%' + params.query + '%'),
+                    // content: Like('%' + params.query + '%'),
                 },
             ],
 
@@ -75,6 +75,35 @@ export class PostService extends BaseService {
             totalPage,
             result,
         });
+    }
+
+    async getByID(id: string) {
+        const result = await this.PostRepository.findOne({
+            where: { id: id },
+            relations: {
+                user: true,
+                category: true,
+            },
+            select: {
+                id: true,
+                thumbnail: true,
+                content: true,
+                created_date: true,
+                user: {
+                    id: true,
+                    full_name: true,
+                    email: true,
+                    avatar: true,
+                    password: false,
+                },
+                category: {
+                    id: true,
+                    name: true,
+                },
+            },
+        });
+
+        return result;
     }
 
     async getByUser(id: string) {
@@ -121,6 +150,8 @@ export class PostService extends BaseService {
                 thumbnail: params.thumbnail,
             };
 
+            console.log(create);
+
             await this.PostRepository.insert(create);
             const result = plainToInstance(PostDto, params.dto, {
                 excludeExtraneousValues: true,
@@ -137,38 +168,40 @@ export class PostService extends BaseService {
 
     async deleted(params: { ids: string[]; user_id: string }): Promise<Result> {
         const user = await this.UserService.findOne(params.user_id);
-
         for (let id of params.ids) {
             const post = await this.PostRepository.findOne({
                 where: { id: id },
-                relations: ['user'],
+                relations: { user: true },
             });
 
-            if (
-                !user.roles.some((role) => role.includes('ADMIN')) ||
-                user.id !== post.id
-            ) {
-                return error.commonError({
-                    location: 'user',
-                    param: 'authen',
-                    message: 'You do not have permission to delete this post',
-                });
+            if (user.roles !== 'ADMIN' || user.id !== post.user.id) {
+                throw new HttpException(
+                    'You do not have permission to delete this post',
+                    HttpsStatus.BAD_REQUEST,
+                );
             } else {
                 await this.PostRepository.softDelete(id);
+                return success.ok({ mess: 'Delete successfuly' });
             }
         }
-
-        return success.ok({ mess: 'Delete successfuly' });
     }
 
     async update(params: {
         dto: UpdatePostDTO;
         user: string;
-        thumbnail: string;
+        thumbnail?: string;
     }): Promise<Result> {
         const user = await this.UserService.findOne(params.user);
+        const category = await this.CategoryService.findOne(
+            params.dto.category_id,
+        );
+        console.log(category);
+        
         const post = await this.PostRepository.findOne({
             where: { id: params.dto.id },
+            relations: {
+                user: true,
+            },
         });
         if (user.id !== post.user.id) {
             return error.commonError({
@@ -178,9 +211,12 @@ export class PostService extends BaseService {
             });
         } else {
             const update = {
-                ...params.dto,
+                content: params.dto.content,
+                category: category,
                 thumbnail: params.thumbnail,
-            } as UpdatePostDTO;
+            };
+
+            console.log(update);
 
             await this.PostRepository.update(post.id, update);
             const result = plainToInstance(PostDto, post, {

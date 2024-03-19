@@ -29,11 +29,8 @@ export class UserEntity extends BaseEntity {
     @Column({ nullable: true, default: null })
     avatar: string;
 
-    @Column({
-        type: 'enum',
-        enum: Roles,
-    })
-    roles: string[];
+    @Column({})
+    roles: string;
 
     @Column({ default: 0, select: true })
     fail_login: number;

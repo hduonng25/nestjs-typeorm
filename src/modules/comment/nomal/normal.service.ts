@@ -76,7 +76,7 @@ export class NormalService {
         });
         if (
             (user && user.id === normalComment.user.id) ||
-            user.roles.some((role) => role.includes('ADMIN'))
+            user.roles === 'ADMIN'
         ) {
             await this.NormalCommentRepository.softDelete(normalComment.id);
             await this.ReplyService.deletedByComment(normalComment.id);

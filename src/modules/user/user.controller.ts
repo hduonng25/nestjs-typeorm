@@ -66,8 +66,6 @@ export class UserController {
         } else if (!file) {
             throw new HttpException('File is required', HttpStatus.BAD_REQUEST);
         } else {
-            console.log(file);
-            
             const data = {
                 id: req.payload.id,
                 avatar: file.fieldname + '/' + file.filename,

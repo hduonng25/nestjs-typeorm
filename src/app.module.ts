@@ -1,4 +1,5 @@
 import {
+    Logger,
     MiddlewareConsumer,
     Module,
     NestModule,
@@ -17,6 +18,7 @@ import { CommentModule } from './modules/comment/comment.module';
 import { UserController } from './modules/user/user.controller';
 import { AuthController } from './modules/auth/auth.controller';
 import { CheckTokenReq } from './modules/auth/check/check.token.request';
+import { MyLogger } from './shared/logger/logger';
 
 @Module({
     imports: [
@@ -34,6 +36,7 @@ import { CheckTokenReq } from './modules/auth/check/check.token.request';
     ],
     controllers: [UserController, AuthController],
     providers: [
+        MyLogger,
         {
             provide: APP_GUARD,
             useClass: RolesGuard,

@@ -29,5 +29,5 @@ export class UserDTO extends BaseDTO {
 
     @IsNotEmpty()
     @Expose()
-    roles: string[];
+    roles: string;
 }

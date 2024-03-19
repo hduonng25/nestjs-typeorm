@@ -78,7 +78,7 @@ export class ReplyService {
             if (
                 user.id === reply_comment.user.id ||
                 user.id === normalComment.user.id ||
-                user.roles.some((role) => role.includes('ADMIN'))
+                user.roles === 'ADMIN'
             ) {
                 await this.ReplyRepository.softDelete(reply_comment.id);
             } else {

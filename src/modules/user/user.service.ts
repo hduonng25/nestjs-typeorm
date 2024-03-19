@@ -74,7 +74,7 @@ export class UserService extends BaseService {
     }
 
     async findOne(id: string): Promise<UserEntity> {
-        const user = await this.UserRepository.findOne({
+        const user: UserEntity = await this.UserRepository.findOne({
             where: { id: id },
             select: {
                 id: true,
@@ -85,7 +85,7 @@ export class UserService extends BaseService {
                 email: true,
                 roles: true,
                 created_date: true,
-                avatar: true
+                avatar: true,
             },
         });
         if (user) {
