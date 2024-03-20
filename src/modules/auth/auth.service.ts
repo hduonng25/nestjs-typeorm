@@ -9,7 +9,7 @@ import { UserDTO } from '../user/dto/user.dto';
 import { Token } from './token';
 import { configs } from '../../configs';
 import { error, Result, success } from '../../shared/result';
-import { HttpsStatus } from '../../common/constant';
+import { HttpsStatus } from '@Common/index';
 
 @Injectable()
 export class AuthService {
@@ -19,42 +19,33 @@ export class AuthService {
         private readonly token: Token,
     ) {}
 
-    public async login(params: LoginDTO) {
+    async login(params: LoginDTO) {
         try {
             const numberOfTired: number = parseFloat(
                 configs.login.number_of_tired,
-            ); //Số lần đăng nhập được phép trước khi bị khoá
-            const user = await this.UserRepository.findOne({
+            );
+            const user = await this.UserRepository.findOneOrFail({
                 where: { email: params.email },
-            }); // Tìm kiêm user dựa theo email được truyền vào
+            });
 
-            if (user && user.password) {
+            if (user.password) {
                 if (user.fail_login === numberOfTired - 1) {
-                    await this.UserRepository.createQueryBuilder()
-                        .update(user)
-                        .set({
-                            last_locked: new Date(),
-                        })
-                        .where('id = :id', { id: user.id })
-                        .execute();
+                    await this.UserRepository.update(user.id, {
+                        last_locked: new Date(),
+                    });
                 } else if (user.fail_login === numberOfTired) {
                     const lastLocked = user.last_locked
                         ? user.last_locked
                         : new Date();
-
                     const now = new Date();
-
-                    const diffInMicrosecond =
+                    const diffInMilliseconds =
                         now.getTime() - lastLocked.getTime();
-
                     const diffInMinutes = Math.ceil(
-                        diffInMicrosecond / (60 * 1000),
+                        diffInMilliseconds / (60 * 1000),
                     );
-
                     const lockTime = parseFloat(configs.auth.lock_time);
 
                     if (diffInMinutes <= lockTime) {
-                        //Bị khoá 30 phút nếu như đăng nhập thất bại 5 lần, check xem thời gian khoá còn lại là bao nhiu
                         return error.commonError({
                             location: 'user',
                             param: 'email or password',
@@ -74,13 +65,12 @@ export class AuthService {
                 });
             }
 
-            const check_pass = bcrypt.compareSync(
+            const check_pass = await bcrypt.compare(
                 params.password.toString(),
                 user.password,
-            ); //check xem mật khẩu truyền vào với mật khẩu trong DB có khớp nhau không
+            );
 
             if (check_pass) {
-                // Nếu có khớp nhau thì xử lý và tạo token
                 const { id, email, full_name } = user;
                 const roles = [user.roles as unknown as string];
                 const payload = { id, email, full_name, roles };
@@ -88,12 +78,11 @@ export class AuthService {
                 const accessToken = await this.token.genAccessToken(payload);
                 const refreshToken = await this.token.ganRefreshToken(id);
 
+                await this.UserRepository.update(user.id, { fail_login: 0 });
+
                 const userResult = plainToInstance(UserDTO, user, {
                     excludeExtraneousValues: true,
                 });
-
-                await this.UserRepository.update(id, { fail_login: 0 });
-
                 const data = {
                     ...userResult,
                     access_token: accessToken.token,
@@ -102,14 +91,11 @@ export class AuthService {
                 };
                 return success.ok(data);
             } else {
-                await this.UserRepository.createQueryBuilder()
-                    .update(user)
-                    .set({
-                        fail_login: () => 'fail_login + 1',
-                    })
-                    .where('id = :id', { id: user.id })
-                    .execute();
-
+                await this.UserRepository.increment(
+                    { id: user.id },
+                    'fail_login',
+                    1,
+                );
                 return error.commonError({
                     location: 'user',
                     param: 'password',
@@ -117,11 +103,14 @@ export class AuthService {
                 });
             }
         } catch (e) {
-            throw new HttpException('Faild login', HttpsStatus.INTERNAL_SERVER);
+            throw new HttpException(
+                'Failed login',
+                HttpsStatus.INTERNAL_SERVER,
+            );
         }
     }
 
-    public async refreshToken(token: string): Promise<Result> {
+    async refreshToken(token: string): Promise<Result> {
         const payload = await this.token.getPayload(token);
         try {
             const user = await this.UserRepository.findOne({

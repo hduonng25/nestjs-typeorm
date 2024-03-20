@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany } from 'typeorm';
-import { PostEntity } from '../../post/entity/post.entity';
-import { BaseEntity } from '../../../common';
+import { BaseEntity } from '@Common/index';
+import { PostEntity } from '/modules/post/entity/post.entity';
 
 @Entity({ name: 'category' })
 export class CategoryEntity extends BaseEntity {

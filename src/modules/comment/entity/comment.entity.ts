@@ -1,8 +1,8 @@
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
-import { UserEntity } from '../../user/entity/user.entity';
-import { ReplyEntity } from '../../reply/entity/reply.entity';
-import { PostEntity } from '../../post/entity/post.entity';
-import { BaseEntity } from '../../../common';
+import { BaseEntity } from '/common';
+import { ReplyEntity } from '/modules/reply/entity/reply.entity';
+import { UserEntity } from '/modules/user/entity/user.entity';
+import { PostEntity } from '/modules/post/entity/post.entity';
 
 @Entity({ name: 'comment' })
 export class CommentEntity extends BaseEntity {

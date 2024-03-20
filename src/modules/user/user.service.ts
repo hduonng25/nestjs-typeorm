@@ -10,7 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { BaseService } from '../../shared/type-orm';
 import { error, Result, success } from '../../shared/result';
 import { FindReqBody } from '../../shared/interface';
-import { HttpsStatus } from '../../common/constant';
+import { HttpsStatus } from '@Common/index';
 
 @Injectable()
 export class UserService extends BaseService {

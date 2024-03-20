@@ -1,4 +1,4 @@
-import { HttpsStatus } from '../../common/constant';
+import { HttpsStatus } from '@Common/index';
 import { ErrorDetail, ResultError } from './result';
 
 export const actionNotAllowed = (): ResultError => {

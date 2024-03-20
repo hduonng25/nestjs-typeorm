@@ -10,7 +10,7 @@ import { CategoryService } from '../category/category.service';
 import { FindReqBody } from '../../shared/interface';
 import { BaseService } from '../../shared/type-orm';
 import { error, Result, success } from '../../shared/result';
-import { HttpsStatus } from '../../common/constant';
+import { HttpsStatus } from '@Common/index';
 
 @Injectable()
 export class PostService extends BaseService {

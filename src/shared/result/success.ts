@@ -1,4 +1,4 @@
-import { HttpsStatus } from '../../common/constant';
+import { HttpsStatus } from '@Common/index';
 import { ResultSuccess } from './result';
 
 export const ok = (data: any): ResultSuccess => {

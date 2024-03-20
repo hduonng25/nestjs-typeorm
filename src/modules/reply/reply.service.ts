@@ -3,10 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ReplyEntity } from './entity/reply.entity';
 import { Repository } from 'typeorm';
 import { CreateReplyReq } from './dto/reply.body';
+import { HttpsStatus } from '@Common/index';
 import { NormalService } from '../comment/comment.service';
 import { UserService } from '../user/user.service';
-import { success } from '../../shared/result';
-import { HttpsStatus } from '../../common/constant';
+import { success } from '@Shared/result';
 
 @Injectable()
 export class ReplyService {

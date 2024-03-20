@@ -5,10 +5,10 @@ import { FindManyOptions, Repository } from 'typeorm';
 import { CreateCategoryDTO, UpdateCategoryDTO } from './dto/category.body.dto';
 import { plainToInstance } from 'class-transformer';
 import { CategoryDTO } from './dto/category.dto';
-import { BaseService } from '../../shared/type-orm';
-import { FindReqBody } from '../../shared/interface';
-import { error, Result, success } from '../../shared/result';
-import { HttpsStatus } from '../../common/constant';
+import { HttpsStatus } from '@Common/index';
+import { BaseService } from '@Shared/type-orm';
+import { FindReqBody } from '@Shared/interface';
+import { Result, error, success } from '@Shared/result';
 
 @Injectable()
 export class CategoryService implements BaseService {

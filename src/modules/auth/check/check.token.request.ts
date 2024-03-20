@@ -2,8 +2,8 @@ import { HttpException, Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { Payload } from '../dto';
-import { HttpsStatus } from '../../../common/constant';
-import { configs } from '../../../configs';
+import { HttpsStatus } from '@Common/index';
+import { configs } from '@Configs/app.config';
 
 declare module 'express-serve-static-core' {
     interface Request {

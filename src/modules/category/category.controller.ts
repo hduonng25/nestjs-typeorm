@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDTO, UpdateCategoryDTO } from './dto/category.body.dto';
-import { FindReqBody } from '../../shared/interface';
+import { FindReqBody } from '@Shared/interface';
 
 @Controller('category')
 export class CategoryController {

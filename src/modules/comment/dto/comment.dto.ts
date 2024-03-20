@@ -1,6 +1,6 @@
-import { ReplyEntity } from '../../reply/entity/reply.entity';
-import { UserEntity } from '../../user/entity/user.entity';
-import { PostEntity } from '../../post/entity/post.entity';
+import { PostEntity } from '/modules/post/entity/post.entity';
+import { ReplyEntity } from '/modules/reply/entity/reply.entity';
+import { UserEntity } from '/modules/user/entity/user.entity';
 
 export class CommentDTO {
     id: string;

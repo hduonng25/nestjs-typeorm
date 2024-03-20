@@ -2,7 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Payload } from '../dto';
 import { configs } from '../../../configs';
-import { HttpsStatus } from '../../../common/constant';
+import { HttpsStatus } from '@Common/index';
 
 const private_key = configs.keys.private_key;
 

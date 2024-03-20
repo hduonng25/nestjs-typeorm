@@ -7,7 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Roles } from './roles.decorator';
 import { Request } from 'express';
-import { HttpsStatus } from '../../common/constant';
+import { HttpsStatus } from '@Common/index';
 
 @Injectable()
 export class RolesGuard implements CanActivate {

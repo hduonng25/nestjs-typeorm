@@ -1,7 +1,6 @@
 import { HttpException, Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
-import { Roles } from '../../../common/enum/roles.enum';
-import { HttpsStatus } from '../../../common/constant';
+import { HttpsStatus, Roles } from '@Common/index';
 
 @Injectable()
 export class CheckRolesMiddleware implements NestMiddleware {

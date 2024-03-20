@@ -1,4 +1,4 @@
-import { HttpsStatus } from '../../common/constant';
+import { HttpsStatus } from '@Common/index';
 
 export interface ResultSuccess {
     status: HttpsStatus;

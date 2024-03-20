@@ -4,10 +4,10 @@ import { Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
 import { PostService } from '../post/post.service';
 import { ReplyService } from '../reply/reply.service';
-import { error, Result, success } from '../../shared/result';
-import { HttpsStatus } from '../../common/constant';
 import { CommentEntity } from './entity/comment.entity';
 import { CreateCommentReq, DeletedCommentReq } from './dto/comment.body';
+import { HttpsStatus } from '@Common/index';
+import { Result, error, success } from '/shared/result';
 
 @Injectable()
 export class NormalService {
