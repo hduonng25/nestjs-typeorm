@@ -39,9 +39,9 @@ export class PostController {
         return this.PostService.getByUser(id);
     }
 
-    @Get('category/:id_category')
-    async getByCategory(@Query('id_category') id_category: string) {
-        return this.PostService.getByCategory(id_category);
+    @Get('category/:id')
+    async getByCategory(@Query('id') id: string) {
+        return this.PostService.getByCategory(id);
     }
 
     @Post()

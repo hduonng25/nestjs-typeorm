@@ -12,7 +12,7 @@ import { NormalService } from './comment.service';
 import { Request } from 'express';
 import { CreateCommentReq } from './dto/comment.body';
 
-@Controller('comment/normal')
+@Controller('comment')
 export class NormalController {
     constructor(private readonly NormalService: NormalService) {}
 
@@ -26,9 +26,9 @@ export class NormalController {
         return this.NormalService.create(data);
     }
 
-    @Get('by-post')
-    async findByPost(@Query('post_id') post_id: string) {
-        return this.NormalService.getByPost({ post_id });
+    @Get('post/:id')
+    async findByPost(@Query('id') id: string) {
+        return this.NormalService.getByPost({ post_id: id });
     }
 
     @Put()
