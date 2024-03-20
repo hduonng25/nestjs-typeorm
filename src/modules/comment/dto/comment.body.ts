@@ -1,4 +1,4 @@
-export interface CreateNormalReq {
+export interface CreateCommentReq {
     user_id: string;
 
     post_id: string;
@@ -6,7 +6,7 @@ export interface CreateNormalReq {
     content: string;
 }
 
-export interface DeletedNormalReq {
+export interface DeletedCommentReq {
     user_id: string;
 
     id: string;

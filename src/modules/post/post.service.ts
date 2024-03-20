@@ -150,8 +150,6 @@ export class PostService extends BaseService {
                 thumbnail: params.thumbnail,
             };
 
-            console.log(create);
-
             await this.PostRepository.insert(create);
             const result = plainToInstance(PostDto, params.dto, {
                 excludeExtraneousValues: true,
@@ -195,8 +193,7 @@ export class PostService extends BaseService {
         const category = await this.CategoryService.findOne(
             params.dto.category_id,
         );
-        console.log(category);
-        
+
         const post = await this.PostRepository.findOne({
             where: { id: params.dto.id },
             relations: {
@@ -215,8 +212,6 @@ export class PostService extends BaseService {
                 category: category,
                 thumbnail: params.thumbnail,
             };
-
-            console.log(update);
 
             await this.PostRepository.update(post.id, update);
             const result = plainToInstance(PostDto, post, {

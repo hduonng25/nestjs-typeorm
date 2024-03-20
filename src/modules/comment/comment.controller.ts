@@ -8,16 +8,16 @@ import {
     Query,
     Req,
 } from '@nestjs/common';
-import { NormalService } from './normal.service';
-import { CreateNormalReq } from './dto/normal.body';
+import { NormalService } from './comment.service';
 import { Request } from 'express';
+import { CreateCommentReq } from './dto/comment.body';
 
 @Controller('comment/normal')
 export class NormalController {
     constructor(private readonly NormalService: NormalService) {}
 
     @Post()
-    async create(@Body() body: CreateNormalReq, @Req() req: Request) {
+    async create(@Body() body: CreateCommentReq, @Req() req: Request) {
         const user_id = req.payload.id;
         const data = {
             user_id,

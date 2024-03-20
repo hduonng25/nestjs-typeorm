@@ -41,4 +41,9 @@ export const configs = {
             create: process.env.USER_CREATE_EXCLUDE,
         },
     },
+
+    file: {
+        limit: process.env.LIMIT_FILE,
+        mess: process.env.MESS,
+    },
 };

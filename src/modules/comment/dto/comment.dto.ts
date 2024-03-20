@@ -1,8 +1,8 @@
 import { ReplyEntity } from '../../reply/entity/reply.entity';
-import { UserEntity } from '../../../user/entity/user.entity';
-import { PostEntity } from '../../../post/entity/post.entity';
+import { UserEntity } from '../../user/entity/user.entity';
+import { PostEntity } from '../../post/entity/post.entity';
 
-export class NormalDto {
+export class CommentDTO {
     id: string;
 
     content: string;

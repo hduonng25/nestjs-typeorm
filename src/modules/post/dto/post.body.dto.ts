@@ -10,7 +10,6 @@ export interface CreatePostDTO extends BaseDTO {
 }
 
 export class UpdatePostDTO extends BaseDTO {
-
     content?: string;
 
     category?: CategoryEntity;

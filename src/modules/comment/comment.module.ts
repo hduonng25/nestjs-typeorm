@@ -1,22 +1,21 @@
-import { Module } from '@nestjs/common';
-import { NormalService } from './nomal/normal.service';
-import { NormalController } from './nomal/normal.controller';
+import { Global, Module, forwardRef } from '@nestjs/common';
+import { NormalService } from './comment.service';
+import { NormalController } from './comment.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { NormalEntity } from './nomal/entity/normal.entity';
-import { ReplyEntity } from './reply/entity/reply.entity';
 import { UserModule } from '../user/user.module';
 import { PostModule } from '../post/post.module';
-import { ReplyService } from './reply/reply.service';
-import { ReplyController } from './reply/reply.controller';
+import { ReplyModule } from '../reply/reply.module';
+import { CommentEntity } from './entity/comment.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([NormalEntity, ReplyEntity]),
+        TypeOrmModule.forFeature([CommentEntity]),
+        forwardRef(() => ReplyModule),
         UserModule,
         PostModule,
     ],
-    providers: [NormalService, ReplyService],
-    controllers: [NormalController, ReplyController],
-    exports: [NormalService, ReplyService],
+    providers: [NormalService],
+    controllers: [NormalController],
+    exports: [NormalService],
 })
 export class CommentModule {}

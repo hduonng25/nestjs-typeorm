@@ -1,9 +1,9 @@
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { UserEntity } from '../../user/entity/user.entity';
 import { CategoryEntity } from '../../category/entity/category.entity';
-import { NormalEntity } from '../../comment/nomal/entity/normal.entity';
-import { ReplyEntity } from '../../comment/reply/entity/reply.entity';
+import { ReplyEntity } from '../../reply/entity/reply.entity';
 import { BaseEntity } from '../../../common';
+import { CommentEntity } from '../../comment/entity/comment.entity';
 
 @Entity({ name: 'post' })
 export class PostEntity extends BaseEntity {
@@ -28,9 +28,9 @@ export class PostEntity extends BaseEntity {
     })
     category: CategoryEntity;
 
-    @OneToMany(() => NormalEntity, (normal) => normal.post)
-    normal_comment: NormalEntity[];
+    @OneToMany(() => CommentEntity, (comment) => comment.post)
+    comment: CommentEntity[];
 
     @OneToMany(() => ReplyEntity, (reply) => reply.post)
-    reply_comment: ReplyEntity[];
+    reply: ReplyEntity[];
 }

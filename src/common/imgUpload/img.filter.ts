@@ -1,6 +1,7 @@
 import { extname } from 'path';
 import { FileEnum } from '../enum/image.enum';
 import { Request } from 'express';
+import { configs } from '../../configs';
 
 export function fileFilter(
     req: Request,
@@ -13,8 +14,8 @@ export function fileFilter(
         callback(null, false);
     } else {
         const fileSize = parseInt(req.headers['content-length']);
-        if (fileSize > 1024 * 1024 * 5) {
-            req.validateFile = `Wrong extention type. Accepted file ext are: ${FileEnum}`;
+        if (fileSize > parseInt(configs.file.limit)) {
+            req.validateFile = `${configs.file.mess}`;
             callback(null, false);
         } else {
             callback(null, true);

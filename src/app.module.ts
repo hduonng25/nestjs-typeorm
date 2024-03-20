@@ -19,6 +19,7 @@ import { UserController } from './modules/user/user.controller';
 import { AuthController } from './modules/auth/auth.controller';
 import { CheckTokenReq } from './modules/auth/check/check.token.request';
 import { MyLogger } from './shared/logger/logger';
+import { ReplyModule } from './modules/reply/reply.module';
 
 @Module({
     imports: [
@@ -33,6 +34,7 @@ import { MyLogger } from './shared/logger/logger';
         CategoryModule,
         AuthModule,
         CommentModule,
+        ReplyModule,
     ],
     controllers: [UserController, AuthController],
     providers: [

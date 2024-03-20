@@ -1,19 +1,20 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { CreateNormalReq, DeletedNormalReq } from './dto/normal.body';
+import { HttpException, Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { NormalEntity } from './entity/normal.entity';
 import { Repository } from 'typeorm';
-import { UserService } from '../../user/user.service';
-import { PostService } from '../../post/post.service';
+import { UserService } from '../user/user.service';
+import { PostService } from '../post/post.service';
 import { ReplyService } from '../reply/reply.service';
-import { error, Result, success } from '../../../shared/result';
-import { HttpsStatus } from '../../../common/constant';
+import { error, Result, success } from '../../shared/result';
+import { HttpsStatus } from '../../common/constant';
+import { CommentEntity } from './entity/comment.entity';
+import { CreateCommentReq, DeletedCommentReq } from './dto/comment.body';
 
 @Injectable()
 export class NormalService {
     constructor(
-        @InjectRepository(NormalEntity)
-        private readonly NormalCommentRepository: Repository<NormalEntity>,
+        @InjectRepository(CommentEntity)
+        private readonly CommentRepository: Repository<CommentEntity>,
+        @Inject(forwardRef(() => ReplyService))
         private readonly ReplyService: ReplyService,
         private readonly UserService: UserService,
         private readonly PostService: PostService,
@@ -21,7 +22,7 @@ export class NormalService {
 
     async getByPost(params: { post_id: string }) {
         const post = await this.PostService.findOne(params.post_id);
-        const normal_comment = await this.NormalCommentRepository.find({
+        const normal_comment = await this.CommentRepository.find({
             where: { post: { id: post.id } },
             relations: {
                 user: true,
@@ -54,7 +55,7 @@ export class NormalService {
         return result_comment;
     }
 
-    async create(params: CreateNormalReq): Promise<Result> {
+    async create(params: CreateCommentReq): Promise<Result> {
         const user = await this.UserService.findOne(params.user_id);
         const post = await this.PostService.findOne(params.post_id);
         const content = params.content;
@@ -65,20 +66,20 @@ export class NormalService {
             post,
         };
 
-        await this.NormalCommentRepository.insert(create);
+        await this.CommentRepository.insert(create);
         return success.ok({ mess: 'Create successfuly' });
     }
 
-    async deleted(params: DeletedNormalReq): Promise<Result> {
+    async deleted(params: DeletedCommentReq): Promise<Result> {
         const user = await this.UserService.findOne(params.user_id);
-        const normalComment = await this.NormalCommentRepository.findOne({
+        const normalComment = await this.CommentRepository.findOne({
             where: { id: params.id },
         });
         if (
             (user && user.id === normalComment.user.id) ||
             user.roles === 'ADMIN'
         ) {
-            await this.NormalCommentRepository.softDelete(normalComment.id);
+            await this.CommentRepository.softDelete(normalComment.id);
             await this.ReplyService.deletedByComment(normalComment.id);
         }
 
@@ -90,17 +91,14 @@ export class NormalService {
         content: string;
         user_id: string;
     }): Promise<Result> {
-        const normalComment = await this.NormalCommentRepository.findOne({
+        const normalComment = await this.CommentRepository.findOne({
             where: { id: params.id },
         });
         const user = await this.UserService.findOne(params.user_id);
         if (normalComment) {
             if (user.id === normalComment.user.id) {
                 normalComment.content = params.content;
-                await this.NormalCommentRepository.update(
-                    params.id,
-                    normalComment,
-                );
+                await this.CommentRepository.update(params.id, normalComment);
                 return success.ok({ mess: 'Update successfuly' });
             } else {
                 return error.commonError({
@@ -116,7 +114,7 @@ export class NormalService {
 
     //External
     async findOne(id: string) {
-        const normalComment = await this.NormalCommentRepository.findOne({
+        const normalComment = await this.CommentRepository.findOne({
             where: { id: id },
         });
         if (normalComment) {

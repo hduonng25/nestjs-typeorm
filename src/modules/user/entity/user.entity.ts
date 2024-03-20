@@ -1,10 +1,10 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { PostEntity } from '../../post/entity/post.entity';
-import { NormalEntity } from '../../comment/nomal/entity/normal.entity';
-import { ReplyEntity } from '../../comment/reply/entity/reply.entity';
+import { ReplyEntity } from '../../reply/entity/reply.entity';
 import { BaseEntity } from '../../../common';
 import { Roles } from '../../../common/enum/roles.enum';
+import { CommentEntity } from '../../comment/entity/comment.entity';
 
 @Entity({ name: 'user' })
 export class UserEntity extends BaseEntity {
@@ -41,11 +41,11 @@ export class UserEntity extends BaseEntity {
     @OneToMany(() => PostEntity, (post) => post.user)
     post: PostEntity[];
 
-    @OneToMany(() => NormalEntity, (cmt) => cmt.user)
-    normal_comment: NormalEntity[];
+    @OneToMany(() => CommentEntity, (comment) => comment.user)
+    comment: CommentEntity[];
 
-    @OneToMany(() => NormalEntity, (cmt) => cmt.user)
-    reply_comment: ReplyEntity[];
+    @OneToMany(() => ReplyEntity, (reply) => reply.user)
+    reply: ReplyEntity[];
 
     @BeforeInsert()
     async hashPasswordCreate() {

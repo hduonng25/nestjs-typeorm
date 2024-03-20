@@ -3,10 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ReplyEntity } from './entity/reply.entity';
 import { Repository } from 'typeorm';
 import { CreateReplyReq } from './dto/reply.body';
-import { NormalService } from '../nomal/normal.service';
-import { UserService } from '../../user/user.service';
-import { success } from '../../../shared/result';
-import { HttpsStatus } from '../../../common/constant';
+import { NormalService } from '../comment/comment.service';
+import { UserService } from '../user/user.service';
+import { success } from '../../shared/result';
+import { HttpsStatus } from '../../common/constant';
 
 @Injectable()
 export class ReplyService {
@@ -20,10 +20,10 @@ export class ReplyService {
 
     async getByComment(params: { id: string }) {
         const result = await this.ReplyRepository.find({
-            where: { normal_comment: { id: params.id } },
+            where: { comment: { id: params.id } },
             relations: {
                 user: true,
-                normal_comment: true,
+                comment: true,
             },
             select: {
                 id: true,
@@ -61,7 +61,7 @@ export class ReplyService {
 
     async deletedByComment(id_comment: string) {
         await this.ReplyRepository.softDelete({
-            normal_comment: { id: id_comment },
+            comment: { id: id_comment },
         });
         return 'deleted successfuly';
     }
