@@ -85,13 +85,6 @@ export class CategoryService implements BaseService {
         const category = await this.CategoryRepository.findOne({
             where: { id: id },
         });
-        if (category) {
-            return category;
-        } else {
-            throw new HttpException(
-                'Category not found',
-                HttpsStatus.INTERNAL_SERVER,
-            );
-        }
+        return category;
     }
 }

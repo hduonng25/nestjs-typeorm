@@ -1,5 +1,4 @@
 import {
-    Logger,
     MiddlewareConsumer,
     Module,
     NestModule,
@@ -18,8 +17,8 @@ import { CommentModule } from './modules/comment/comment.module';
 import { UserController } from './modules/user/user.controller';
 import { AuthController } from './modules/auth/auth.controller';
 import { CheckTokenReq } from './modules/auth/check/check.token.request';
-import { MyLogger } from './shared/logger/logger';
 import { ReplyModule } from './modules/reply/reply.module';
+import { LoggerModule } from './modules/logger/logger.module';
 
 @Module({
     imports: [
@@ -35,10 +34,10 @@ import { ReplyModule } from './modules/reply/reply.module';
         AuthModule,
         CommentModule,
         ReplyModule,
+        LoggerModule,
     ],
     controllers: [UserController, AuthController],
     providers: [
-        MyLogger,
         {
             provide: APP_GUARD,
             useClass: RolesGuard,

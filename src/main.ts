@@ -4,7 +4,6 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { configs } from './configs';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { join } from 'path';
-import { logger } from './shared/logger/logger';
 import { NextFunction, Request, Response } from 'express';
 
 async function main() {
@@ -37,7 +36,7 @@ async function main() {
     app.useStaticAssets(join(__dirname, '../upload'));
 
     await app.listen(port, host, () => {
-        logger.verbose(`Listening on: ${host}:${port}`);
+        Logger.verbose(`Listening on: ${host}:${port}`);
     });
 }
 

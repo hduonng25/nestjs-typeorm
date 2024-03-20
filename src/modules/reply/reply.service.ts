@@ -13,9 +13,9 @@ export class ReplyService {
     constructor(
         @InjectRepository(ReplyEntity)
         private readonly ReplyRepository: Repository<ReplyEntity>,
-        private readonly UserService: UserService,
         @Inject(forwardRef(() => NormalService))
         private readonly NormalService: NormalService,
+        private readonly UserService: UserService,
     ) {}
 
     async getByComment(params: { id: string }) {
@@ -42,13 +42,15 @@ export class ReplyService {
 
     async create(params: CreateReplyReq) {
         try {
-            const user = await this.UserService.findOne(params.user_id);
-            const commnet = await this.NormalService.findOne(params.comment_id);
-            if (user && commnet) {
+            const [user, comment] = await Promise.all([
+                this.UserService.findOne(params.user_id),
+                this.NormalService.findOne(params.comment_id),
+            ]);
+            if (user && comment) {
                 const data = {
                     content: params.content,
                     user,
-                    commnet,
+                    comment,
                 };
 
                 await this.ReplyRepository.insert(data);
@@ -67,31 +69,32 @@ export class ReplyService {
     }
 
     async deleted(params: { id: string; id_comment: string; user_id: string }) {
-        const normalComment = await this.NormalService.findOne(
-            params.id_comment,
-        );
-        const user = await this.UserService.findOne(params.user_id);
-        const reply_comment = await this.ReplyRepository.findOne({
-            where: { id: params.id },
-        });
-        if (normalComment) {
-            if (
-                user.id === reply_comment.user.id ||
-                user.id === normalComment.user.id ||
-                user.roles === 'ADMIN'
-            ) {
-                await this.ReplyRepository.softDelete(reply_comment.id);
-            } else {
-                throw new HttpException(
-                    'Faild deleted',
-                    HttpsStatus.BAD_REQUEST,
-                );
-            }
-        } else {
+        const { id, id_comment, user_id } = params;
+
+        const [normalComment, user, replyComment] = await Promise.all([
+            this.NormalService.findOne(id_comment),
+            this.UserService.findOne(user_id),
+            this.ReplyRepository.findOne({ where: { id: id } }),
+        ]);
+
+        if (!normalComment) {
             throw new HttpException(
                 'Comment not found',
                 HttpsStatus.BAD_REQUEST,
             );
         }
+
+        const isAdmin = user.roles === 'ADMIN';
+        const isOwner =
+            user.id === replyComment.user.id ||
+            user.id === normalComment.user.id;
+
+        if (!isAdmin && !isOwner) {
+            throw new HttpException(
+                'Failed to delete',
+                HttpsStatus.BAD_REQUEST,
+            );
+        }
+        await this.ReplyRepository.softDelete(replyComment.id);
     }
 }

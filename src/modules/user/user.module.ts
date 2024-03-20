@@ -10,9 +10,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './entity/user.entity';
 import { checkUser } from './check/check.user';
 import { CheckRolesMiddleware } from './middleware/check.role.middleware';
+import { LoggerModule } from '../logger/logger.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([UserEntity])],
+    imports: [TypeOrmModule.forFeature([UserEntity]), LoggerModule],
     providers: [UserService, checkUser],
     controllers: [UserController],
     exports: [UserService],

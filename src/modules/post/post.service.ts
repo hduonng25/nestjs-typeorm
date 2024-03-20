@@ -29,11 +29,7 @@ export class PostService extends BaseService {
         const skip = (params.page - 1) * params.size;
 
         const findManyOptions: FindManyOptions<PostEntity> = {
-            where: [
-                {
-                    // content: Like('%' + params.query + '%'),
-                },
-            ],
+            where: [{}],
 
             take: params.size,
 
@@ -139,26 +135,28 @@ export class PostService extends BaseService {
         thumbnail: string;
     }): Promise<Result> {
         try {
-            const category = await this.CategoryService.findOne(
-                params.dto.category_id,
-            );
-            const user = await this.UserService.findOne(params.is_user);
+            const { dto, is_user, thumbnail } = params;
+
+            const [category, user] = await Promise.all([
+                this.CategoryService.findOne(dto.category_id),
+                this.UserService.findOne(is_user),
+            ]);
+
             const create = {
                 user,
-                category,
-                ...params.dto,
-                thumbnail: params.thumbnail,
-            };
+                ...(category ? { category } : {}),
+                ...dto,
+                thumbnail,
+            } as Partial<PostEntity>;
 
-            await this.PostRepository.insert(create);
-            const result = plainToInstance(PostDto, params.dto, {
+            const result = await this.PostRepository.insert(create);
+            const postDto = plainToInstance(PostDto, result, {
                 excludeExtraneousValues: true,
             });
-
-            return success.ok(result);
+            return success.ok(postDto);
         } catch (e) {
             throw new HttpException(
-                'Invalid server',
+                'Internal Server Error',
                 HttpsStatus.INTERNAL_SERVER,
             );
         }
@@ -166,22 +164,28 @@ export class PostService extends BaseService {
 
     async deleted(params: { ids: string[]; user_id: string }): Promise<Result> {
         const user = await this.UserService.findOne(params.user_id);
+
+        const isAdmin = user.roles === 'ADMIN';
+
         for (let id of params.ids) {
             const post = await this.PostRepository.findOne({
-                where: { id: id },
-                relations: { user: true },
+                where: { id },
+                relations: ['user'],
             });
 
-            if (user.roles !== 'ADMIN' || user.id !== post.user.id) {
+            const hasPermissionToDelete = isAdmin || user.id === post.user.id;
+
+            if (!hasPermissionToDelete) {
                 throw new HttpException(
                     'You do not have permission to delete this post',
                     HttpsStatus.BAD_REQUEST,
                 );
-            } else {
-                await this.PostRepository.softDelete(id);
-                return success.ok({ mess: 'Delete successfuly' });
             }
+
+            await this.PostRepository.softDelete(id);
         }
+
+        return success.ok({ message: 'Delete successfuly' });
     }
 
     async update(params: {
@@ -189,36 +193,38 @@ export class PostService extends BaseService {
         user: string;
         thumbnail?: string;
     }): Promise<Result> {
-        const user = await this.UserService.findOne(params.user);
-        const category = await this.CategoryService.findOne(
-            params.dto.category_id,
-        );
+        const { dto, user, thumbnail } = params;
 
-        const post = await this.PostRepository.findOne({
-            where: { id: params.dto.id },
-            relations: {
-                user: true,
-            },
-        });
-        if (user.id !== post.user.id) {
+        const [foundUser, category, post] = await Promise.all([
+            this.UserService.findOne(user),
+            this.CategoryService.findOne(dto.category_id),
+            this.PostRepository.findOne({
+                where: { id: dto.id },
+                relations: ['user'],
+            }),
+        ]);
+
+        const isAdmin = foundUser.roles === 'ADMIN';
+
+        if (foundUser.id !== post.user.id || !isAdmin) {
             return error.commonError({
                 location: 'user',
                 param: 'authen',
                 message: 'You do not have permission to edit this post',
             });
-        } else {
-            const update = {
-                content: params.dto.content,
-                category: category,
-                thumbnail: params.thumbnail,
-            };
-
-            await this.PostRepository.update(post.id, update);
-            const result = plainToInstance(PostDto, post, {
-                excludeExtraneousValues: true,
-            });
-            return success.ok({ mess: 'Update successfuly', ...result });
         }
+
+        const update: Partial<PostEntity> = {
+            content: dto.content,
+            category,
+            thumbnail,
+        };
+        await this.PostRepository.update(post.id, update);
+
+        const result = plainToInstance(PostDto, post, {
+            excludeExtraneousValues: true,
+        });
+        return success.ok({ mess: 'Update successfuly', ...result });
     }
 
     async getByCategory(id: string): Promise<PostEntity[]> {
@@ -228,7 +234,7 @@ export class PostService extends BaseService {
             });
             return result;
         } catch (e) {
-            throw e;
+            throw new HttpException('Invalid server', HttpsStatus.BAD_REQUEST);
         }
     }
 

@@ -56,9 +56,11 @@ export class NormalService {
     }
 
     async create(params: CreateCommentReq): Promise<Result> {
-        const user = await this.UserService.findOne(params.user_id);
-        const post = await this.PostService.findOne(params.post_id);
-        const content = params.content;
+        const [user, post, content] = await Promise.all([
+            this.UserService.findOne(params.user_id),
+            this.PostService.findOne(params.post_id),
+            params.content,
+        ]);
 
         const create = {
             content,
