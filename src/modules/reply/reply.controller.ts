@@ -3,7 +3,7 @@ import { ReplyService } from './reply.service';
 import { Request } from 'express';
 import { CreateReplyReq } from './dto/reply.body';
 
-@Controller('comment/reply')
+@Controller('reply')
 export class ReplyController {
     constructor(private readonly ReplyService: ReplyService) {}
 

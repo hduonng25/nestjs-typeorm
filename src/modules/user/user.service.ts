@@ -7,10 +7,10 @@ import { plainToInstance } from 'class-transformer';
 import { changePasswordDTO } from './dto/change.password.dto';
 import { checkUser } from './check/check.user';
 import * as bcrypt from 'bcrypt';
-import { BaseService } from '../../shared/type-orm';
 import { error, Result, success } from '../../shared/result';
-import { FindReqBody } from '../../shared/interface';
 import { HttpsStatus } from '@Common/index';
+import { BaseService } from '/shared/type-orm';
+import { FindReqBody } from '/shared/interface';
 
 @Injectable()
 export class UserService extends BaseService {
