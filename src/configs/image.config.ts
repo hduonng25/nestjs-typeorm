@@ -5,7 +5,7 @@ export const StorageConfigs = (folder: string) =>
     diskStorage({
         destination: `upload/${folder}`,
         filename(
-            req: Request,
+            _: Request,
             file: Express.Multer.File,
             callback: (error: Error | null, filename: string) => void,
         ) {

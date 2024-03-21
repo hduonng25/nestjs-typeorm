@@ -153,7 +153,7 @@ export const commonError = (params: {
     const _param = params.param || 'id';
     return {
         status: HttpsStatus.BAD_REQUEST,
-        code: 'NOT_FOUND',
+        code: 'COMMON',
         errors: [
             {
                 location: _location,
