@@ -61,10 +61,6 @@ export class AppModule implements NestModule {
                     path: configs.exclude.user.create,
                     method: RequestMethod.POST,
                 },
-                {
-                    path: 'blog/home/',
-                    method: RequestMethod.GET,
-                },
             )
             .forRoutes('*');
     }

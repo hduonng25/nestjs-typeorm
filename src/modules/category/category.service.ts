@@ -8,7 +8,7 @@ import { CategoryDTO } from './dto/category.dto';
 import { HttpsStatus } from '@Common/index';
 import { BaseService } from '@Shared/type-orm';
 import { FindReqBody } from '@Shared/interface';
-import { Result, error, success } from '@Shared/result';
+import { Result, success } from '@Shared/result';
 import { CheckCategory } from './check/check.category';
 
 @Injectable()
@@ -21,8 +21,8 @@ export class CategoryService implements BaseService {
     ) {}
 
     async findAll(params: FindReqBody): Promise<Result> {
-        const page = params.page > 0 ? params.page : 1;
-        const size = params.size > 0 ? params.size : 10;
+        const page = params.page ?? 1
+        const size = params.size ?? 10
         const skip = (params.page - 1) * params.size;
 
         const findManyOptions: FindManyOptions<CategoryEntity> = {

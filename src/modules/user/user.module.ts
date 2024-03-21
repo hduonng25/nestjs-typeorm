@@ -11,6 +11,7 @@ import { UserEntity } from './entity/user.entity';
 import { checkUser } from './check/check.user';
 import { CheckRolesMiddleware } from './middleware/check.role.middleware';
 import { LoggerModule } from '../logger/logger.module';
+import { configs } from '/configs';
 
 @Module({
     imports: [TypeOrmModule.forFeature([UserEntity]), LoggerModule],
@@ -23,8 +24,14 @@ export class UserModule implements NestModule {
         consumer
             .apply(CheckRolesMiddleware)
             .forRoutes(
-                { path: '/user/', method: RequestMethod.POST },
-                { path: '/user/', method: RequestMethod.PUT },
+                {
+                    path: `${configs.exclude.user.create}`,
+                    method: RequestMethod.POST,
+                },
+                {
+                    path: `${configs.exclude.user.update}`,
+                    method: RequestMethod.PUT,
+                },
             );
     }
 }

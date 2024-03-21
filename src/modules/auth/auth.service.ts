@@ -7,9 +7,9 @@ import * as bcrypt from 'bcrypt';
 import { plainToInstance } from 'class-transformer';
 import { UserDTO } from '../user/dto/user.dto';
 import { Token } from './token';
-import { configs } from '../../configs';
-import { error, Result, success } from '../../shared/result';
 import { HttpsStatus } from '@Common/index';
+import { configs } from '/configs';
+import { Result, error, success } from '/shared/result';
 
 @Injectable()
 export class AuthService {
@@ -76,7 +76,7 @@ export class AuthService {
                 const payload = { id, email, full_name, roles };
 
                 const accessToken = await this.token.genAccessToken(payload);
-                const refreshToken = await this.token.ganRefreshToken(id);
+                const refreshToken = await this.token.genRefreshToken(id);
 
                 await this.UserRepository.update(user.id, { fail_login: 0 });
 
@@ -126,7 +126,7 @@ export class AuthService {
                 const payload = { id, email, full_name, roles };
 
                 const accessToken = await this.token.genAccessToken(payload);
-                const refreshToken = await this.token.ganRefreshToken(id);
+                const refreshToken = await this.token.genRefreshToken(id);
 
                 const userResult = plainToInstance(UserDTO, user, {
                     excludeExtraneousValues: true,
