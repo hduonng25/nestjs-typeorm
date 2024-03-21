@@ -38,17 +38,18 @@ export class Token {
         }
     } //TODO: Tạo access token với nhưng dữ liệu được truyền vào của user
 
-    public async ganRefreshToken(id: string): Promise<{
+    public async genRefreshToken(id: string): Promise<{
         token: string;
         expireAt: number;
     }> {
         try {
             const timestampInSec = new Date().getDate() / 1000;
-            const expireAt = Math.floor(timestampInSec + 60 * 60);
+            const timeExpire = parseFloat(configs.jwt.expire_refresh_token_at);
+            const expireAt = Math.floor(timestampInSec + timeExpire);
 
             const token = this.jwtService.sign(
                 { id, type: 'REFRESH_TOKEN' },
-                { privateKey: private_key },
+                { privateKey: private_key, expiresIn: expireAt },
             );
 
             return { token, expireAt };

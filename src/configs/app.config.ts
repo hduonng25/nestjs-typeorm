@@ -17,6 +17,7 @@ export const configs = {
         expiresIn: process.env.EXPIRES_IN,
         algorithm: process.env.ALGORITHM || 'RS256',
         expire_at: process.env.EXPIRE_AT || '3600',
+        expire_refresh_token_at: process.env.EXPIRE_REFRESH_TOKEN_AT
     },
 
     login: {
@@ -39,11 +40,17 @@ export const configs = {
         },
         user: {
             create: process.env.USER_CREATE_EXCLUDE,
+            update: process.env.USER_CREATE_EXCLUDE,
         },
     },
 
     file: {
         limit: process.env.LIMIT_FILE,
         mess: process.env.MESS,
+    },
+
+    random: {
+        character: process.env.CHARACTER,
+        length: process.env.LENGTH,
     },
 };

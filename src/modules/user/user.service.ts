@@ -11,6 +11,7 @@ import { error, Result, success } from '../../shared/result';
 import { HttpsStatus } from '@Common/index';
 import { BaseService } from '/shared/type-orm';
 import { FindReqBody } from '/shared/interface';
+import { configs } from '/configs';
 
 @Injectable()
 export class UserService extends BaseService {
@@ -24,14 +25,13 @@ export class UserService extends BaseService {
     ) {
         super();
 
-        this.random = () => {
-            const length = 8;
-            const characters =
-                'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let ranDom = '';
-            const charactersLength = characters.length;
+        this.random = (): string => {
+            const length: number = parseInt(configs.random.length);
+            const characters = `${configs.random.character}`;
+            let ranDom: string = '';
+            const charactersLength: number = characters.length;
 
-            for (let i = 0; i < length; i++) {
+            for (let i: number = 0; i < length; i++) {
                 ranDom += characters.charAt(
                     Math.floor(Math.random() * charactersLength),
                 );
@@ -42,8 +42,8 @@ export class UserService extends BaseService {
     }
 
     async findAll(params: FindReqBody): Promise<Result> {
-        const page = params.page > 0 ? params.page : 1;
-        const size = params.size > 0 ? params.size : 10;
+        const page = params.page ?? 1;
+        const size = params.size ?? 10;
         const skip = (page - 1) * size;
 
         const findManyOptions: FindManyOptions<UserEntity> = {
