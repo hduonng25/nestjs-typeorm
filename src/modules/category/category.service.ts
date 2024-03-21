@@ -10,6 +10,7 @@ import { BaseService } from '@Shared/type-orm';
 import { FindReqBody } from '@Shared/interface';
 import { Result, success } from '@Shared/result';
 import { CheckCategory } from './check/check.category';
+import { HttpError } from '/shared/error';
 
 @Injectable()
 export class CategoryService implements BaseService {
@@ -21,8 +22,8 @@ export class CategoryService implements BaseService {
     ) {}
 
     async findAll(params: FindReqBody): Promise<Result> {
-        const page = params.page ?? 1
-        const size = params.size ?? 10
+        const page = params.page ?? 1;
+        const size = params.size ?? 10;
         const skip = (params.page - 1) * params.size;
 
         const findManyOptions: FindManyOptions<CategoryEntity> = {
@@ -32,8 +33,7 @@ export class CategoryService implements BaseService {
             order: { created_date: 'DESC' },
         };
 
-        const [result, total] =
-            await this.CategoryRepository.findAndCount(findManyOptions);
+        const [result, total] = await this.CategoryRepository.findAndCount(findManyOptions);
 
         const totalPage = Math.ceil(total / params.size);
 
@@ -52,10 +52,12 @@ export class CategoryService implements BaseService {
         });
 
         if (check) {
-            throw new HttpException(
-                'Name category is readly exits',
-                HttpsStatus.BAD_REQUEST,
-            );
+            throw new HttpError({
+                status: HttpsStatus.BAD_REQUEST,
+                description: {
+                    en: 'Name category is readly exits',
+                },
+            });
         } else {
             try {
                 const check = await this.CategoryRepository.insert(params);
@@ -64,10 +66,7 @@ export class CategoryService implements BaseService {
                 });
                 return success.ok(result);
             } catch (e) {
-                throw new HttpException(
-                    'INVALID_SERVER',
-                    HttpsStatus.INTERNAL_SERVER,
-                );
+                throw new HttpException('INVALID_SERVER', HttpsStatus.INTERNAL_SERVER);
             }
         }
     }

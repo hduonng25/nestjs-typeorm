@@ -115,6 +115,7 @@ export class UserService extends BaseService {
             return success.created(result);
         } else {
             return error.commonError({
+                code: "EMAIL_EXITSTS",
                 location: 'user',
                 param: 'email',
                 message: `Email ${params.email} already exists`,

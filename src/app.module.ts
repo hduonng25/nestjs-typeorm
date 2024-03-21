@@ -1,13 +1,8 @@
-import {
-    MiddlewareConsumer,
-    Module,
-    NestModule,
-    RequestMethod,
-} from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { configs, withCache } from './configs';
 import { JwtModule } from '@nestjs/jwt';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { RolesGuard } from './shared/guard';
 import { UserModule } from './modules/user/user.module';
 import { PostModule } from './modules/post/post.module';
@@ -19,6 +14,8 @@ import { AuthController } from './modules/auth/auth.controller';
 import { CheckTokenReq } from './modules/auth/check/check.token.request';
 import { ReplyModule } from './modules/reply/reply.module';
 import { LoggerModule } from './modules/logger/logger.module';
+import { ResultInterceptor } from './shared/interceptor/result.interceptor';
+import { HttpExceptionFilter } from './shared/exception/exception.handler';
 
 @Module({
     imports: [
@@ -41,6 +38,14 @@ import { LoggerModule } from './modules/logger/logger.module';
         {
             provide: APP_GUARD,
             useClass: RolesGuard,
+        },
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: ResultInterceptor,
+        },
+        {
+            provide: APP_FILTER,
+            useClass: HttpExceptionFilter,
         },
     ],
 })

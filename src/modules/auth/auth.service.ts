@@ -10,6 +10,7 @@ import { Token } from './token';
 import { HttpsStatus } from '@Common/index';
 import { configs } from '/configs';
 import { Result, error, success } from '/shared/result';
+import { HttpError } from '/shared/error';
 
 @Injectable()
 export class AuthService {
@@ -21,9 +22,7 @@ export class AuthService {
 
     async login(params: LoginDTO) {
         try {
-            const numberOfTired: number = parseFloat(
-                configs.login.number_of_tired,
-            );
+            const numberOfTired: number = parseFloat(configs.login.number_of_tired);
             const user = await this.UserRepository.findOneOrFail({
                 where: { email: params.email },
             });
@@ -34,23 +33,17 @@ export class AuthService {
                         last_locked: new Date(),
                     });
                 } else if (user.fail_login === numberOfTired) {
-                    const lastLocked = user.last_locked
-                        ? user.last_locked
-                        : new Date();
+                    const lastLocked = user.last_locked ? user.last_locked : new Date();
                     const now = new Date();
-                    const diffInMilliseconds =
-                        now.getTime() - lastLocked.getTime();
-                    const diffInMinutes = Math.ceil(
-                        diffInMilliseconds / (60 * 1000),
-                    );
+                    const diffInMilliseconds = now.getTime() - lastLocked.getTime();
+                    const diffInMinutes = Math.ceil(diffInMilliseconds / (60 * 1000));
                     const lockTime = parseFloat(configs.auth.lock_time);
 
                     if (diffInMinutes <= lockTime) {
                         return error.commonError({
                             location: 'user',
                             param: 'email or password',
-                            message:
-                                'Account is temporarily locked for 30 minutes',
+                            message: 'Account is temporarily locked for 30 minutes',
                         });
                     } else {
                         await this.UserRepository.update(user.id, {
@@ -65,10 +58,7 @@ export class AuthService {
                 });
             }
 
-            const check_pass = await bcrypt.compare(
-                params.password.toString(),
-                user.password,
-            );
+            const check_pass = await bcrypt.compare(params.password.toString(), user.password);
 
             if (check_pass) {
                 const { id, email, full_name } = user;
@@ -91,11 +81,7 @@ export class AuthService {
                 };
                 return success.ok(data);
             } else {
-                await this.UserRepository.increment(
-                    { id: user.id },
-                    'fail_login',
-                    1,
-                );
+                await this.UserRepository.increment({ id: user.id }, 'fail_login', 1);
                 return error.commonError({
                     location: 'user',
                     param: 'password',
@@ -103,10 +89,13 @@ export class AuthService {
                 });
             }
         } catch (e) {
-            throw new HttpException(
-                'Failed login',
-                HttpsStatus.INTERNAL_SERVER,
-            );
+            throw new HttpError({
+                status: HttpsStatus.BAD_REQUEST,
+                description: {
+                    en: 'Failed login',
+                },
+                errors: e,
+            });
         }
     }
 
@@ -143,15 +132,9 @@ export class AuthService {
             }
         } catch (e) {
             if (e.name && e.name === 'TokenExpiredError') {
-                throw new HttpException(
-                    'Your token expired',
-                    HttpsStatus.INTERNAL_SERVER,
-                );
+                throw new HttpException('Your token expired', HttpsStatus.INTERNAL_SERVER);
             } else {
-                throw new HttpException(
-                    'Your token is not valid',
-                    HttpsStatus.BAD_REQUEST,
-                );
+                throw new HttpException('Your token is not valid', HttpsStatus.BAD_REQUEST);
             }
         }
     }

@@ -9,8 +9,8 @@ export interface ResultError {
     status: HttpsStatus;
     code?: string;
     description?: {
-        vi: string;
-        en: string;
+        vi?: string;
+        en?: string;
     };
     errors?: ErrorDetail[];
     details?: any;
