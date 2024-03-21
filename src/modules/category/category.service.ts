@@ -9,12 +9,15 @@ import { HttpsStatus } from '@Common/index';
 import { BaseService } from '@Shared/type-orm';
 import { FindReqBody } from '@Shared/interface';
 import { Result, error, success } from '@Shared/result';
+import { CheckCategory } from './check/check.category';
 
 @Injectable()
 export class CategoryService implements BaseService {
     constructor(
         @InjectRepository(CategoryEntity)
         private readonly CategoryRepository: Repository<CategoryEntity>,
+
+        private readonly checkcategory: CheckCategory,
     ) {}
 
     async findAll(params: FindReqBody): Promise<Result> {
@@ -44,17 +47,28 @@ export class CategoryService implements BaseService {
     }
 
     async create(params: CreateCategoryDTO): Promise<Result> {
-        try {
-            await this.CategoryRepository.insert(params);
-            const result = plainToInstance(CategoryDTO, params, {
-                excludeExtraneousValues: true,
-            });
-            return success.ok(result);
-        } catch (e) {
+        const check = await this.CategoryRepository.findOne({
+            where: { name: params.name },
+        });
+
+        if (check) {
             throw new HttpException(
-                'INVALID_SERVER',
-                HttpsStatus.INTERNAL_SERVER,
+                'Name category is readly exits',
+                HttpsStatus.BAD_REQUEST,
             );
+        } else {
+            try {
+                const check = await this.CategoryRepository.insert(params);
+                const result = plainToInstance(CategoryDTO, params, {
+                    excludeExtraneousValues: true,
+                });
+                return success.ok(result);
+            } catch (e) {
+                throw new HttpException(
+                    'INVALID_SERVER',
+                    HttpsStatus.INTERNAL_SERVER,
+                );
+            }
         }
     }
 
@@ -66,19 +80,12 @@ export class CategoryService implements BaseService {
     }
 
     async update(params: UpdateCategoryDTO): Promise<Result> {
-        const check = await this.CategoryRepository.findOne({
-            where: { id: params.id },
+        await this.checkcategory.checkDuplicateName({
+            id: params.id,
+            name: params.name,
         });
-        if (check) {
-            await this.CategoryRepository.update(params.id, params);
-            return success.ok({ mess: 'Update successfuly' });
-        } else {
-            return error.commonError({
-                location: 'category',
-                param: 'id',
-                message: 'category not found',
-            });
-        }
+        await this.CategoryRepository.update(params.id, params);
+        return success.ok({ mess: 'Update successfuly' });
     }
 
     async findOne(id: string): Promise<CategoryEntity> {
